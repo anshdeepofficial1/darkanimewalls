@@ -1,140 +1,94 @@
-# Dark Anime Walls Website
-<p align="center">
-  <a href="https://github.com/sponsors/anshdeepofficial"><img src="https://img.shields.io/badge/Sponsor-%E2%9D%A4-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor on GitHub" height="40" /></a>
-  <a href="https://buymeacoffee.com/anshdeepofficial"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" height="40" /></a>
-</p>
+<div align="center">
 
-This project gives you:
+# 🌌 Dark Anime Walls
 
-- a **public wallpaper website** (`index.html`) for your visitors
-- a **private upload page** (`studio.html`) only for you
-- API files that connect everything to Cloudinary storage
+**A responsive anime wallpaper gallery with original-quality downloads and a private creator studio.**
 
-It is designed to be simple, clean, and easy to manage.
+![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+![Cloudinary](https://img.shields.io/badge/Media-Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-Frontend-F7DF1E?style=for-the-badge&logo=javascript&logoColor=000)
+![Stars](https://img.shields.io/github/stars/anshdeepofficial/darkanimewalls?style=for-the-badge&logo=github)
 
----
+<a href="https://github.com/sponsors/anshdeepofficial"><img src="https://img.shields.io/badge/Sponsor-%E2%9D%A4-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Sponsor on GitHub" /></a>
+<a href="https://buymeacoffee.com/anshdeepofficial"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=000" alt="Buy Me a Coffee" /></a>
 
-## What visitors can do
-
-On the public website, people can:
-
-- browse wallpapers
-- search and filter wallpapers
-- open previews
-- download original-quality files
-- send custom wallpaper requests
-- contact you for collaborations
-
-Visitors do **not** see your private upload tools.
+</div>
 
 ---
 
-## Your private manager page
+## ✨ Overview
 
-Your private page is:
+Dark Anime Walls combines a public wallpaper gallery with a private studio used to manage uploads. Visitors can browse, search, preview, randomize, and directly download wallpapers while the owner manages media through a protected workflow backed by Cloudinary.
 
-```text
-https://your-domain.com/studio.html
-```
+## 🚀 Visitor Experience
 
-Use this page to upload and delete wallpapers.
+- Browse desktop and mobile wallpapers
+- Search and filter the gallery
+- Open large responsive previews
+- Download original-quality images directly
+- Discover a random wallpaper
+- Submit wallpaper requests
+- Access collaboration/contact options
+- Enjoy a responsive animated interface
 
-Important:
-- Keep this link private.
-- Do not put it in your public menu.
+## 🔐 Private Studio
 
----
+The project includes `studio.html` for owner-only upload and delete operations. Keep the studio URL and password private and never expose Cloudinary secrets in client-side code.
 
-## Before you start
+## 🛠️ Tech Stack
 
-You need:
+| Area | Technology |
+| --- | --- |
+| Frontend | HTML, CSS, JavaScript |
+| Media storage | Cloudinary |
+| Hosting / serverless | Vercel |
+| Owner access | Password-protected studio workflow |
 
-1. A Cloudinary account
-2. A Vercel project
-3. Your Cloudinary details from the dashboard:
-   - Cloud Name
-   - API Key
-   - API Secret
+## ⚡ Local Development
 
----
-
-## Vercel settings you must add
-
-In **Vercel → Project Settings → Environment Variables**, add:
-
-```text
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-STUDIO_PASSWORD=choose_a_strong_private_password
-CLOUDINARY_TAG=dark-anime-walls
-CLOUDINARY_FOLDER=dark-anime-walls
-```
-
-Security rule:
-- Never place your API Secret directly inside HTML files.
-- Keep secrets only in Vercel environment variables.
-- Always use HTTPS in production so the studio password is never sent over plain HTTP.
-
----
-
-## How uploading works (simple flow)
-
-1. Open `/studio.html`
-2. Enter your private studio password
-3. Upload your original image (PNG/JPG/WebP)
-4. Image is saved to Cloudinary
-5. It appears automatically on the public website
-
-The file stays in original quality for downloads.
-
----
-
-## Run locally on your computer
-
-Install Vercel CLI:
+Install the Vercel CLI and run the project locally:
 
 ```bash
 npm i -g vercel
-```
-
-Start the project:
-
-```bash
 vercel dev
 ```
 
-Open:
+Then open:
 
 ```text
 http://localhost:3000
 http://localhost:3000/studio.html
 ```
 
----
+## ⚙️ Environment Variables
 
-## Deploy steps
-
-1. Push this project to GitHub
-2. Import the repository in Vercel
-3. Add all required environment variables
-4. Deploy
-5. Open `/studio.html` and upload your first wallpaper
-
----
-
-## Update your contact details
-
-In `index.html`, replace these placeholders with your real details:
+Configure these securely in Vercel:
 
 ```text
-darkanimewalls
-darkanimewalls@outlook.com
+CLOUDINARY_CLOUD_NAME
+CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET
+STUDIO_PASSWORD
+CLOUDINARY_TAG
+CLOUDINARY_FOLDER
 ```
+
+Do not commit real secrets to the repository.
+
+## 🚀 Deployment
+
+1. Push changes to GitHub.
+2. Import the repository into Vercel.
+3. Add the required environment variables.
+4. Deploy.
+5. Use the private studio to manage wallpaper content.
+
+## 🤝 Contributing
+
+Contributions that improve responsiveness, gallery performance, accessibility, download behavior, or creator tooling are welcome.
 
 ---
 
-## Notes
-
-- This setup is best for a single owner/admin.
-- If you plan to grow into a bigger team, add a full authentication system later.
+<div align="center">
+Built by <a href="https://github.com/anshdeepofficial">Anshdeep Singh</a>
+</div>
