@@ -4,6 +4,7 @@
 import {readFile,writeFile,mkdir} from "node:fs/promises";
 import {resolve,join} from "node:path";
 import {execFileSync} from "node:child_process";
+import {scheduleTen,recentOwnerPosts} from "./schedule.mjs";
 if(process.env.ENABLE_PAID_IMAGE_API!=="I_ACCEPT_SEPARATE_API_CHARGES") {
   throw new Error("Paid API disabled. ChatGPT Plus does not pay for unattended Images API usage. Nothing generated or charged.");
 }
@@ -71,16 +72,10 @@ function compositeExactCenter(backgroundPath,mobilePath,desktopPath) {
     "-filter_complex","[1:v]scale=648:1152[centre];[0:v][centre]overlay=x=(main_w-overlay_w)/2:y=0:format=auto,format=rgb24[out]",
     "-map","[out]","-frames:v","1",desktopPath],{stdio:"inherit"});
 }
+const {basis:scheduleBasis,scheduledAt:publishSchedule}=scheduleTen(Date.now(),await recentOwnerPosts());
 const day=new Date(Date.now()+330*60000).toISOString().slice(0,10);
-const baseUtc=Date.parse(day+"T00:00:00Z")-330*60000;
-const slots=[9,10.5,12,13.5,15,16.5,18,19.5,21,22.5];
-const publishSchedule=slots.map(hour=>{
-  let time=baseUtc+hour*3600000;
-  if(time<Date.now()+30*60000) time+=24*3600000;
-  return new Date(time).toISOString();
-});
 const dropId="daw-"+day.replace(/-/g,"");
-const result={dropId,character,researchSources:research.sources,pairs:[]};
+const result={dropId,character,researchSources:research.sources,scheduleBasis,pairs:[]};
 for(let i=0;i<concepts.length;i++){
   const [name,brief]=concepts[i],index=String(i+1).padStart(2,"0");
   const mainPrompt="Create one outstanding ORIGINAL 9:16 2D anime wallpaper of "+character+
