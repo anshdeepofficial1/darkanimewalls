@@ -49,14 +49,15 @@ async function editImage(original,prompt,size) {
   return api("images/edits",{model:"gpt-image-2.5-sunburst",size,quality:"high",output_format:"png",
     images:[{image_url:"data:image/png;base64,"+original.toString("base64")}],prompt});
 }
-async function visionReview(image,condition) {
+async function visionReview(image,condition,preview=null) {
   const response=await fetch("https://api.openai.com/v1/responses",{
     method:"POST",headers:{"Authorization":"Bearer "+process.env.OPENAI_API_KEY,"Content-Type":"application/json"},
     body:JSON.stringify({model:process.env.OPENAI_QA_MODEL||"gpt-4.1-mini",input:[{
       role:"user",content:[{type:"input_text",text:"Evaluate this "+condition+
       " wallpaper strictly for visibly malformed anatomy, off-model character depiction of "+character+
       ", cheap repetitive neon effects, visual noise, unreadable silhouette, and poor wallpaper usability. For mobile, upper 22 percent must have unobstructed space for phone clock and widgets; do not reject a small unobtrusive skyline. Respond ONLY JSON {pass:boolean,reason:string}. Reject obviously bad images."},
-      {type:"input_image",image_url:"data:image/png;base64,"+image.toString("base64")}]}
+      {type:"input_image",image_url:"data:image/png;base64,"+image.toString("base64")},
+      ...(preview?[{type:"input_text",text:"Second image shows a simulated phone lockscreen clock overlaid for QA only. The clock is NOT in the original artwork. Reject if the clock obscures the character's face or key focal details."},{type:"input_image",image_url:"data:image/png;base64,"+preview.toString("base64")}]:[])]}
     ],max_output_tokens:180})
   });
   const data=await response.json();
@@ -66,6 +67,11 @@ async function visionReview(image,condition) {
     const verdict=JSON.parse(text.replace(/^```(?:json)?/,"").replace(/```$/,"").trim());
     return verdict.pass===true;
   } catch {return false;}
+}
+function renderLockscreenPreview(source,dest) {
+  execFileSync("ffmpeg",["-hide_banner","-loglevel","error","-y","-i",source,
+    "-vf","drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='09\\\\:41':fontcolor=white:fontsize=148:x=(w-text_w)/2:y=h*0.10:shadowcolor=black:shadowx=2:shadowy=2",
+    "-frames:v","1",dest],{stdio:"inherit"});
 }
 function compositeExactCenter(backgroundPath,mobilePath,desktopPath) {
   execFileSync("ffmpeg",["-hide_banner","-loglevel","error","-y","-i",backgroundPath,"-i",mobilePath,
@@ -84,7 +90,9 @@ for(let i=0;i<concepts.length;i++){
   const mobile=await generateImage(mainPrompt,SIZE_MOBILE);
   const mobileFile=join(outputDir,index+"-mobile.png");
   await writeFile(mobileFile,mobile);
-  if(!(await visionReview(mobile,"mobile 9:16"))) throw new Error("Visual QA rejected mobile design "+index+". No incomplete batch will be imported.");
+  const lockPreviewPath=join(outputDir,index+"-lockscreen-preview.png");
+  renderLockscreenPreview(mobileFile,lockPreviewPath);
+  if(!(await visionReview(mobile,"mobile 9:16",await readFile(lockPreviewPath)))) throw new Error("Visual QA rejected mobile design "+index+". No incomplete batch will be imported.");
   const extendPrompt="Extend this EXACT 9:16 anime wallpaper to a 16:9 desktop scene. Keep the original character's facial features, exact position, pose, outfit, lighting and all content in the center identical. Create only natural matching scenery to the left and right, the central 9:16 scene fills the full height, no borders or cropping. No text. Art direction: "+brief;
   const outpaint=await editImage(mobile,extendPrompt,SIZE_DESKTOP);
   const outpaintPath=join(outputDir,index+"-extended-background.png");
