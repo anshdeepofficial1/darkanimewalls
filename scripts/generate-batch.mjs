@@ -70,7 +70,7 @@ async function visionReview(image,condition,preview=null) {
 }
 function renderLockscreenPreview(source,dest) {
   execFileSync("ffmpeg",["-hide_banner","-loglevel","error","-y","-i",source,
-    "-vf","drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='09\\\\:41':fontcolor=white:fontsize=148:x=(w-text_w)/2:y=h*0.10:shadowcolor=black:shadowx=2:shadowy=2",
+    "-vf","drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='09\\:41':fontcolor=white:fontsize=148:x=(w-text_w)/2:y=h*0.10:shadowcolor=black:shadowx=2:shadowy=2",
     "-frames:v","1",dest],{stdio:"inherit"});
 }
 function compositeExactCenter(backgroundPath,mobilePath,desktopPath) {
