@@ -59,7 +59,7 @@ for(const pair of manifest.pairs) {
   verifyRatio(desktop,16/9);
   const audio=pair.audioFile?safePath(base,pair.audioFile):null;
   if(audio && pair.audioRightsConfirmed!==true) throw new Error("Audio rights must be confirmed for "+pairId);
-  if(!audio && process.env.ALLOW_SILENT_REELS!=="true") throw new Error("Missing licensed audio for "+pairId+". Set ALLOW_SILENT_REELS=true only if you accept silent Reels.");
+  if(!audio && !pair.musicQuery && !pair.audioId && process.env.ALLOW_SILENT_REELS!=="true") throw new Error("Choose authorized Instagram Audio API music, licensed file, or explicitly allow silent Reels: "+pairId);
   planned.push({pair,pairId,mobile,desktop,audio,scheduledAt:new Date(scheduledAt).toISOString()});
 }
 if(process.env.CONFIRM_BATCH_IMPORT!=="true") throw new Error("Set CONFIRM_BATCH_IMPORT=true after reviewing the 10 concepts. No images were uploaded.");
@@ -75,7 +75,7 @@ try {
     const movie=await uploadAsset({filePath:videoPath,kind:"video",publicId:dropId+"-"+pairId+"-reel",tags:[character.toLowerCase().replace(/\s+/g,"-")],context:{dropId,pairId}});
     const mobileUpload=await uploadAsset({filePath:mobile,publicId:dropId+"-"+pairId+"-mobile",
       tags:["mobile","automation"],context:{...shared,type:"Mobile 9:16",reelUrl:movie.secure_url,
-        igCaption:String(pair.caption),igStatus:"queued",musicCredit:String(pair.musicCredit||"")}});
+        igCaption:String(pair.caption),igStatus:"queued",musicCredit:String(pair.musicCredit||""),musicQuery:String(pair.musicQuery||""),igAudioId:String(pair.audioId||"")}});
     const desktopUpload=await uploadAsset({filePath:desktop,publicId:dropId+"-"+pairId+"-desktop",
       tags:["desktop","automation"],context:{...shared,type:"Desktop 16:9",igStatus:"paired"}});
     console.log(JSON.stringify({pairId,scheduledAt,mobileId:mobileUpload.public_id,desktopId:desktopUpload.public_id,reelUrl:movie.secure_url}));
