@@ -38,10 +38,24 @@ async function createAndPublish(resource) {
   if(!caption || !/^https:\/\//.test(video)) throw new Error("Missing Reel URL/caption: "+resource.public_id);
   const existing=await getPublishedReel(caption);
   if(existing) return {id:existing.id,permalink:existing.permalink,recovered:true};
+  // Music can come from Meta's authorized Instagram Audio API, Facebook Login only.
+  // If the requested track is unavailable, do not silently publish without music.
+  let audioId=String(ctx.igAudioId||"").trim();
+  const musicQuery=String(ctx.musicQuery||"").trim();
+  if(!audioId && musicQuery) {
+    if(process.env.IG_AUDIO_API_ENABLED!=="true") throw new Error("Instagram Audio API access is not enabled for "+resource.public_id);
+    const search=await graph("ig_audio?audio_type=music&search_query="+encodeURIComponent(musicQuery));
+    const candidate=(search.data||[])[0];
+    audioId=String(candidate?.audio_id||candidate?.id||"");
+    if(!/^\\d+$/.test(audioId)) throw new Error("No Meta-authorized music matched "+musicQuery);
+  }
+  if(!audioId && process.env.ALLOW_SILENT_REELS!=="true") throw new Error("No licensed soundtrack selected; publication deferred");
   // Store a marker before creating the container. A crash requires reconciliation,
   // rather than silently starting a duplicate new attempt next run.
   await updateImageContext(resource,{igStatus:"publishing"});
-  const created=await graph(account+"/media",{method:"POST",data:{media_type:"REELS",video_url:video,caption,share_to_feed:"true"}});
+  const params={media_type:"REELS",video_url:video,caption,share_to_feed:"true"};
+  if(audioId) params.audio_configuration=JSON.stringify({audio_id:audioId,audio_volume:100,video_volume:0});
+  const created=await graph(account+"/media",{method:"POST",data:params});
   if(!created.id) throw new Error("Instagram did not return a media container ID");
   await updateImageContext(resource,{igContainerId:created.id});
   let ready=false;
