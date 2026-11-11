@@ -7,7 +7,7 @@
     "dev": "vercel dev",
     "start": "vercel dev",
     "test": "node --test tests/*.test.cjs",
-    "check:automation": "node --check scripts/cloudinary.mjs && node --check scripts/import-batch.mjs && node --check scripts/publish-due.mjs && node --check api/wallpapers.js"
+    "check:automation": "node --check scripts/cloudinary.mjs && node --check scripts/import-batch.mjs && node --check scripts/publish-due.mjs && node --check api/wallpapers.js && node --check scripts/generate-batch.mjs && node --check scripts/trend-research.mjs"
   },
   "engines": {
     "node": ">=18"
