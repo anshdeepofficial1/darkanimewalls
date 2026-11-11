@@ -68,7 +68,7 @@ async function visionReview(image,condition) {
 }
 function compositeExactCenter(backgroundPath,mobilePath,desktopPath) {
   execFileSync("ffmpeg",["-hide_banner","-loglevel","error","-y","-i",backgroundPath,"-i",mobilePath,
-    "-filter_complex","[1:v]scale=648:1152:centered[centre];[0:v][centre]overlay=x=(main_w-overlay_w)/2:y=0:format=auto,format=rgb24[out]",
+    "-filter_complex","[1:v]scale=648:1152[centre];[0:v][centre]overlay=x=(main_w-overlay_w)/2:y=0:format=auto,format=rgb24[out]",
     "-map","[out]","-frames:v","1",desktopPath],{stdio:"inherit"});
 }
 const day=new Date(Date.now()+330*60000).toISOString().slice(0,10);
