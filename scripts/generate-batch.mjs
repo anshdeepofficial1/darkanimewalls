@@ -102,7 +102,7 @@ for(let i=0;i<concepts.length;i++){
     mobileFile:index+"-mobile.png",desktopFile:index+"-desktop.png",caption:
       character+" — "+name+" ✨\nSave this wallpaper and download both versions from darkanimewalls.vercel.app\n#AnimeWallpaper #"+character.replace(/[^a-zA-Z0-9]/g,"")+" #DarkAnimeWalls",
     scheduledAt:publishSchedule[i],qaApproved:true,qaProvider:"image-vision-review",
-    audioFile:null,musicCredit:"Audio selection and music rights pending"});
+    audioFile:null,musicQuery:["cinematic piano","manga dark instrumental","rain lofi","ambient night","dramatic phonk","forest lofi","dreamy slow reverb","city pop instrumental","dark cinematic","epic orchestral"][i],musicCredit:"Meta-authorized music selected at publish time"});
   console.log("Completed image pair "+(i+1)+"/10");
 }
 await writeFile(join(outputDir,"batch.json"),JSON.stringify(result,null,2));
