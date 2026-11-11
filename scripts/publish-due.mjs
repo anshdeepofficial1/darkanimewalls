@@ -47,7 +47,7 @@ async function createAndPublish(resource) {
     const search=await graph("ig_audio?audio_type=music&search_query="+encodeURIComponent(musicQuery));
     const candidate=(search.data||[])[0];
     audioId=String(candidate?.audio_id||candidate?.id||"");
-    if(!/^\\d+$/.test(audioId)) throw new Error("No Meta-authorized music matched "+musicQuery);
+    if(!/^\d+$/.test(audioId)) throw new Error("No Meta-authorized music matched "+musicQuery);
   }
   if(!audioId && process.env.ALLOW_SILENT_REELS!=="true") throw new Error("No licensed soundtrack selected; publication deferred");
   // Store a marker before creating the container. A crash requires reconciliation,
