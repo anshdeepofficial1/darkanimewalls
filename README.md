@@ -44,6 +44,14 @@ The project includes `studio.html` for owner-only upload and delete operations. 
 | Hosting / serverless | Vercel |
 | Owner access | Password-protected studio workflow |
 
+## 🤖 AI Wallpaper Autopilot (safe by default)
+
+The codebase now includes an optional, tested pipeline to research current anime popularity signals, generate 10 mobile wallpapers with 10 preserved-center desktop extensions, stage assets to Cloudinary, prepare licensed-audio Reels, publish through an authorized Instagram professional account, and release matched website pairs after confirmation.
+
+**No automation is activated by simply deploying this code.** The scheduled workflows are off by default. **ChatGPT Plus does not pay for separate OpenAI API image-generation charges**, and production Instagram/Cloudinary credentials must be configured and verified before publication.
+
+See **[Autopilot implementation and setup](docs/AUTOPILOT.md)** for security, limits, music, tested constraints and activation steps.
+
 ## ⚡ Local Development
 
 Install the Vercel CLI and run the project locally:
