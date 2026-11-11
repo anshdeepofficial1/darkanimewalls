@@ -7,7 +7,7 @@
 - Paged Cloudinary catalog instead of silently truncating the gallery at 100 assets.
 - Releases respect `draft` and `publishAt`, with extra `dropId`, `pairId` fields for matching 9:16 and 16:9 originals.
 - One run can research currently airing anime/character popularity using fresh Jikan results, cross-check Google Trends RSS mentions where possible, and cite source URLs. **Popularity proxies are not actual Google search counts.**
-- Optional Images API generator creates 10 distinct 9:16 artworks, image-vision QA, 10 16:9 outpaints, and a manifest. To preserve the center *exactly*, the 9:16 artwork is composited over the AI-generated extension. Outpainting seam quality still requires visual QA.
+- Optional Images API generator creates 10 distinct 9:16 artworks, image-vision QA (including a simulated 09:41 lock-screen clock overlay), 10 16:9 outpaints, and a manifest. To preserve the center *exactly*, the 9:16 artwork is composited over the AI-generated extension. Outpainting seam quality still requires visual QA.
 - Importer checks exactly 10 unique, visually approved pairs, file dimensions, schedule validity, captions, and audio rights before any uploads. Video Reels and originals are stored in Cloudinary as drafts; releases happen only after Instagram publication.
 - Publisher checks due times, posts 9:16 Reels via the official Instagram professional API, tracks statuses, and then releases corresponding website pairs. Failed or uncertain publishes remain embargoed and appear as failures, not success.
 - Licensed music can be selected through Meta's Instagram Audio API when the account uses **Facebook Login**, the app has correct permissions and `IG_AUDIO_API_ENABLED=true`. Only Meta-authorized tracks are selected; missing or blocked music fails closed.
@@ -21,7 +21,7 @@
 3. Cloudinary account quota and real production credentials could not be verified here. No new Cloudinary asset was uploaded.
 4. ChatGPT Plus does **not** include unattended Images API generation/edits. Automated generation needs a separately billed API key and explicit opt-in. By default it is **OFF**, preserving the zero-extra-cost rule.
 5. The image-vision QA model is probabilistic and cannot guarantee correct canonical identity, perfect hands or flawless outpainting; reviewing early packs is strongly recommended.
-6. Custom release windows currently use initial testing slots in India, not verified Instagram audience insights. To optimize them, obtain authorized owner analytics and implement learn-from-results ranking.
+6. Custom release windows use owner post engagement when at least 15 prior posts are accessible; otherwise they use explicitly labeled initial test slots in India, not verified Instagram audience insights. To optimize them, obtain authorized owner analytics and implement learn-from-results ranking.
 
 ## Secret setup (never commit or paste credentials into chat)
 
