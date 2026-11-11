@@ -548,6 +548,7 @@
         <p id="modalDescription"></p>
         <div class="modal-actions">
           <a class="btn primary" id="modalDownload" download>Download Original Quality</a>
+          <button class="btn" id="modalPair" type="button" style="display:none">Matching Size</button>
           <button class="btn blue" id="copyCaption" type="button">Copy Caption</button>
           <button class="btn" id="shareWallpaper" type="button">Share</button>
         </div>
@@ -722,6 +723,7 @@
     const modalTitle = document.getElementById("modalTitle");
     const modalDescription = document.getElementById("modalDescription");
     const modalDownload = document.getElementById("modalDownload");
+    const modalPair = document.getElementById("modalPair");
     const closeModal = document.getElementById("closeModal");
     const toast = document.getElementById("toast");
 
@@ -741,6 +743,12 @@
       modalDescription.textContent = w.description || "Premium dark anime wallpaper.";
       modalDownload.href = downloadHref(w);
       modalDownload.setAttribute("download", "");
+      const counterpart = w.pairId && w.dropId ? wallpapers.find(other =>
+        other.public_id !== w.public_id && other.pairId === w.pairId && other.dropId === w.dropId &&
+        isDesktopWallpaper(other) !== isDesktopWallpaper(w)) : null;
+      modalPair.style.display = counterpart ? "" : "none";
+      modalPair.textContent = counterpart ? (isDesktopWallpaper(counterpart) ? "View Matching Desktop 16:9" : "View Matching Phone 9:16") : "";
+      modalPair.onclick = counterpart ? () => openPreview(counterpart.public_id) : null;
       modal.classList.add("show");
       document.body.style.overflow = "hidden";
     }

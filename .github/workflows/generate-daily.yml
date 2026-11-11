@@ -1,0 +1,46 @@
+# The image provider is billed SEPARATELY from ChatGPT Plus.
+# This workflow is dormant until both vars are explicitly set true.
+name: DarkAnimeWalls daily image studio
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 2 * * *' # 08:00 India time; best effort, not exact
+
+permissions:
+  contents: read
+
+concurrency:
+  group: darkanimewalls-generation
+  cancel-in-progress: false
+
+jobs:
+  create-staged-wallpapers:
+    if: ${{ vars.AUTOPILOT_GENERATION_ENABLED == 'true' && vars.PAID_IMAGE_API_OPT_IN == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Test code before contacting paid providers
+        run: npm test && npm run check:automation
+      - name: Select today's airing-anime character with evidence
+        run: node scripts/trend-research.mjs > research.json
+      - name: Generate and check ten matching 9:16 and 16:9 pairs
+        run: node scripts/generate-batch.mjs research.json ./generated
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ENABLE_PAID_IMAGE_API: I_ACCEPT_SEPARATE_API_CHARGES
+      - name: Import validated 20-image pack as unpublished drafts
+        run: node scripts/import-batch.mjs ./generated/batch.json
+        env:
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          CLOUDINARY_FOLDER: ${{ vars.CLOUDINARY_FOLDER }}
+          CLOUDINARY_TAG: ${{ vars.CLOUDINARY_TAG }}
+          CONFIRM_BATCH_IMPORT: 'true'

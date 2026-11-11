@@ -1,0 +1,42 @@
+# SAFE BY DEFAULT: The GitHub Actions variable AUTOPILOT_ENABLED must be "true".
+# Configure all Cloudinary and Instagram secrets before enabling. Scheduling
+# is best effort; GitHub scheduled workflows can start several minutes late.
+name: DarkAnimeWalls coordinated publisher
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: darkanimewalls-instagram-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: ${{ vars.AUTOPILOT_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Verify scripts before any publishing
+        run: npm test && npm run check:automation
+      - name: Publish due Reels and release paired wallpapers
+        run: node scripts/publish-due.mjs
+        env:
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          CLOUDINARY_TAG: ${{ vars.CLOUDINARY_TAG }}
+          IG_ACCOUNT_ID: ${{ secrets.IG_ACCOUNT_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          META_GRAPH_VERSION: ${{ vars.META_GRAPH_VERSION }}
+          IG_AUDIO_API_ENABLED: ${{ vars.IG_AUDIO_API_ENABLED }}
