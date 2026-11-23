@@ -1,7 +1,7 @@
 {
   "enabled": true,
-  "model": "klein",
+  "model": "lucid",
   "count": 1,
-  "max_neurons": 300,
+  "max_neurons": 4500,
   "mobile_only": true
 }
