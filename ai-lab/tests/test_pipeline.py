@@ -48,8 +48,8 @@ class LabPipelineTests(unittest.TestCase):
 
     def test_pair_creates_private_manifest_and_gallery(self):
         seen = []
-        def fake_infer(job, account, token, *, reference_image=None):
-            seen.append((job["orientation"], reference_image is not None))
+        def fake_infer(job, account, token, *, reference_image=None, reference_images=None):
+            seen.append((job["orientation"], bool(reference_image or reference_images)))
             return patterned_png(job["width"], job["height"])
         with mock.patch.object(lab, "infer", side_effect=fake_infer):
             self.assertEqual(lab.run_generate(self.args), 0)
