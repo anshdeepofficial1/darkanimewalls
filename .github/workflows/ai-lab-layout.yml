@@ -1,0 +1,45 @@
+name: Dark Anime AI Lab — authentic character layout (unpublished)
+
+on:
+  push:
+    branches:
+      - lab/premium-wallpaper-engine
+    paths:
+      - "ai-lab/reference-character/layout-request.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dark-anime-ai-lab-character-layout
+  cancel-in-progress: false
+
+jobs:
+  layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install isolated lab dependencies
+        run: python -m pip install -r ai-lab/requirements.txt
+      - name: Build original-background authentic-character composition
+        run: python ai-lab/reference_layout.py
+      - name: Save LAB-ONLY copyright-restricted comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reference-character-layout-${{ github.run_id }}
+          path: |
+            ai-lab/out/gojo-s1-authentic-layout-*.png
+            ai-lab/out/authentic-layout-manifest.json
+          if-no-files-found: ignore
+          retention-days: 2
+      - name: Explicit publication prohibition
+        if: always()
+        run: |
+          echo "## Character identity test — UNPUBLISHED" >> "$GITHUB_STEP_SUMMARY"
+          echo "Contains original protected promotional character artwork; reference/comparison only." >> "$GITHUB_STEP_SUMMARY"
+          echo "Do not redistribute or use on a public wallpaper site without license/rights review." >> "$GITHUB_STEP_SUMMARY"
