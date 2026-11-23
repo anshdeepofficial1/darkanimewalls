@@ -1,7 +1,8 @@
 {
   "enabled": false,
-  "model": "lucid",
+  "model": "klein",
   "count": 1,
-  "max_neurons": 4500,
-  "mobile_only": true
+  "max_neurons": 300,
+  "mobile_only": true,
+  "reference_pack": "gojo-adult-s1"
 }
