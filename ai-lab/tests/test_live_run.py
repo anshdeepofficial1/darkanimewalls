@@ -57,6 +57,24 @@ class RequestTests(unittest.TestCase):
                 "max_neurons": 900, "mobile_only": False,
             })
 
+    @mock.patch.object(live_run.lab, "run_generate", return_value=0)
+    def test_premium_lucid_requires_vertical_single(self, generate):
+        with self.assertRaisesRegex(ValueError, "one 9:16"):
+            self.run_with({
+                "enabled": True, "model": "lucid", "count": 1,
+                "max_neurons": 5200, "mobile_only": False,
+            })
+        generate.assert_not_called()
+
+    @mock.patch.object(live_run.lab, "run_generate", return_value=0)
+    def test_explicit_premium_lucid_one_image(self, generate):
+        self.run_with({
+            "enabled": True, "model": "lucid", "count": 1,
+            "max_neurons": 5200, "mobile_only": True,
+        })
+        self.assertEqual(generate.call_args.args[0].model, "lucid")
+        self.assertTrue(generate.call_args.args[0].mobile_only)
+
 
 if __name__ == "__main__":
     unittest.main()
