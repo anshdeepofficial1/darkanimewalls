@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/image-sitemap.xml",
+      "destination": "/api/image-sitemap"
+    }
+  ]
+}
