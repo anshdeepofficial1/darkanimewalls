@@ -45,3 +45,18 @@ References:
 - https://developers.cloudflare.com/workers-ai/platform/pricing/
 - https://developers.cloudflare.com/workers-ai/models/flux-2-klein-4b/
 - https://developers.cloudflare.com/workers-ai/models/lucid-origin/
+
+## Live GitHub Actions test (initially DISARMED)
+1. Open Cloudflare **Workers AI → Use REST API → Create a Workers AI API Token**. Copy its Account ID and API token. Cloudflare says a custom token needs Workers AI **Read** and **Edit** permissions. Never paste the token into an issue, a GitHub file, or chat.
+2. At https://github.com/anshdeepofficial1/darkanimewalls/settings/secrets/actions create the repository secrets `CF_ACCOUNT_ID` and `CF_API_TOKEN`.
+3. On branch `lab/premium-wallpaper-engine`, edit **only** `ai-lab/live-request.json`: change `"enabled": false` to `"enabled": true`, then commit. The separate **Dark Anime AI Lab — isolated image test** workflow runs on that explicit file change and uploads candidates to GitHub Actions artifacts only.
+4. Download the Action artifact and open its `review.html` beside the PNGs to inspect the real model quality. Once done, switch `enabled` back to `false`; this causes a safe no-inference run. Nothing uploads to the public site.
+
+Initial safe test: `"model": "klein", "count": 1, "mobile_only": false, "max_neurons": 900` creates at most one mobile+desktop pair. For a **separately approved**, higher-cost premium comparison, use `"model": "lucid", "count": 1, "mobile_only": true, "max_neurons": 5200` for **one vertical portrait**. Both attempts will still fail if the Cloudflare account lacks model access or has used its daily free quota. Requests are not retried with a paid provider.
+
+Note: The branch-only GitHub Actions test runs from a changed request file. GitHub only exposes `workflow_dispatch` workflow buttons when the workflow exists on the repository default branch. We deliberately avoid modifying the default branch during this laboratory phase.
+
+## Benchmark acceptance criteria
+- Native 9:16 / 16:9 output dimensions, supported model response, no duplicates, and non-flat contrast are **automated checks**.
+- Recognizable character anatomy, rich lighting, premium polish, uniqueness, and parity with competitor art require **manual image review**.
+- The lab has no Instagram, Cloudinary or Vercel credentials and will never publish.
