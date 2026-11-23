@@ -20,8 +20,21 @@ def run_request(path: Path) -> int:
         raise ValueError("count must be an integer")
     if not 1 <= request["count"] <= 3:
         raise ValueError("Live image tests allow only 1-3 concepts")
-    if not isinstance(request["max_neurons"], (int, float)) or not 0 < request["max_neurons"] <= 900:
-        raise ValueError("First testing phase maximum is 900 estimated Neurons per run")
+    if not isinstance(request["mobile_only"], bool):
+        raise ValueError("mobile_only must be a boolean")
+    # A premium Lucid portrait costs far more than a Klein pair. Restrict
+    # Lucid to one explicitly requested vertical comparison image at a time.
+    if request["model"] == "lucid" and (
+        request["count"] != 1 or request["mobile_only"] is not True
+    ):
+        raise ValueError("Lucid benchmark is limited to one 9:16 portrait")
+    cap = 5200 if request["model"] == "lucid" else 900
+    if (
+        not isinstance(request["max_neurons"], (int, float))
+        or isinstance(request["max_neurons"], bool)
+        or not 0 < request["max_neurons"] <= cap
+    ):
+        raise ValueError(f"This model's per-run maximum is {cap} estimated Neurons")
     if not isinstance(request["mobile_only"], bool):
         raise ValueError("mobile_only must be a boolean")
     return lab.run_generate(SimpleNamespace(
