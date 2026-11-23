@@ -101,7 +101,7 @@ def compose_character(character: Image.Image, orientation: str) -> Image.Image:
     x = center_x - art.width//2
     y = bottom - art.height
     silhouette = Image.new("RGBA",(w,h))
-    silhouette.paste(art,(x,y),art)
+    silhouette.alpha_composite(art,(x,y))
     alpha = silhouette.getchannel("A")
     glow=Image.new("RGBA",(w,h),(38,145,255,0))
     glow.putalpha(alpha.filter(ImageFilter.GaussianBlur(24)).point(lambda a:int(a*.60)))
