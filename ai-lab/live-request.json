@@ -1,5 +1,5 @@
 {
-  "enabled": true,
+  "enabled": false,
   "model": "lucid",
   "count": 1,
   "max_neurons": 4500,
