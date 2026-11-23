@@ -321,8 +321,9 @@ const contactEmail="darkanimewalls@outlook.com";
 function mailContact(subject,body){
   const u="https://outlook.live.com/mail/0/deeplink/compose?to="+encodeURIComponent(contactEmail)+"&subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
   // Submit through the visitor's mail client—no request is stored by this site.
-  const popup=window.open(u,"_blank","noopener,noreferrer");
-  if(!popup)window.location.href="mailto:"+contactEmail+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+  const popup=window.open(u,"_blank");
+  if(popup){try{popup.opener=null}catch{}}
+  else window.location.href="mailto:"+contactEmail+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
 }
 $("requestForm")?.addEventListener("submit",event=>{
   event.preventDefault();
