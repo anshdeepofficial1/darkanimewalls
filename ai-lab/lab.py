@@ -285,6 +285,8 @@ def run_generate(args: argparse.Namespace) -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     records, previous_hashes, reference = [], {"mobile": [], "desktop": []}, {}
     for job in chosen["jobs"]:
+        if job["reference_from_mobile"] and job["concept"] not in reference:
+            raise RuntimeError("Mobile image failed automated checks; refusing to generate an unpaired desktop candidate")
         source_bytes = reference.get(job["concept"]) if job["reference_from_mobile"] else None
         raw = infer(job, account_id, token, reference_image=source_bytes)
         quality = inspect_image(
