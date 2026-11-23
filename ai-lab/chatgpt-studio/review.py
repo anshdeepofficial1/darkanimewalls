@@ -177,4 +177,6 @@ def run(manifest_path: Path | None = None, inbox: Path | None = None, out: Path 
 
 
 if __name__ == "__main__":
-    run()
+    result = run()
+    if result["image_count"] and result["technical_pass_count"] != result["image_count"]:
+        raise SystemExit("Some submitted image files failed QA; see the review artifact.")
