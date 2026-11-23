@@ -35,8 +35,6 @@ def run_request(path: Path) -> int:
         or not 0 < request["max_neurons"] <= cap
     ):
         raise ValueError(f"This model's per-run maximum is {cap} estimated Neurons")
-    if not isinstance(request["mobile_only"], bool):
-        raise ValueError("mobile_only must be a boolean")
     return lab.run_generate(SimpleNamespace(
         confirm_free_quota=True,
         model=request["model"],
