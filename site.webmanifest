@@ -1,0 +1,19 @@
+{
+  "id": "/",
+  "name": "Dark Anime Walls",
+  "short_name": "Dark Anime Walls",
+  "description": "Browse free dark anime wallpapers for mobile and desktop screens.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0d0e10",
+  "theme_color": "#0d0e10",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/Logo/Logo.png",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
