@@ -160,7 +160,8 @@ def extract_image(response: requests.Response) -> bytes:
 
 def infer(
     job: dict[str, Any], account_id: str, token: str,
-    *, reference_image: bytes | None = None, timeout: int = 180,
+    *, reference_image: bytes | None = None,
+    reference_images: list[bytes] | None = None, timeout: int = 180,
 ) -> bytes:
     model = job["model"]
     if model not in MODEL_IDS.values():
@@ -177,11 +178,18 @@ def infer(
         if model == MODEL_IDS["klein"]:
             # Cloudflare requires multipart/form-data even without a reference.
             files = {key: (None, value) for key, value in fields.items()}
+            refs = list(reference_images or [])
             if reference_image is not None:
-                files["input_image_0"] = ("reference.png", reference_image, "image/png")
+                if refs:
+                    raise ValueError("Use reference_image OR reference_images, not both")
+                refs.append(reference_image)
+            if len(refs) > 4:
+                raise ValueError("Only up to four reference images are supported")
+            for idx, reference_bytes in enumerate(refs):
+                files[f"input_image_{idx}"] = (f"reference-{idx}.png", reference_bytes, "image/png")
             response = requests.post(url, files=files, headers=headers, timeout=timeout)
         else:
-            if reference_image is not None:
+            if reference_image is not None or reference_images:
                 raise ValueError("Lucid Origin endpoint has no reference image parameter")
             # JSON models require numeric values, unlike multipart form fields.
             fields["width"] = int(job["width"])
@@ -290,6 +298,22 @@ def run_generate(args: argparse.Namespace) -> int:
             "Missing CF_ACCOUNT_ID or CF_API_TOKEN: add GitHub Secrets; do not paste tokens here"
         )
     chosen = plan(args.model, args.count, paired=not args.mobile_only)
+    official_pack_id = getattr(args, "reference_pack", None)
+    reference_images = []
+    if official_pack_id:
+        if args.model != "klein" or args.count != 1:
+            raise RuntimeError("Official references require one Klein concept only")
+        # Keep the reference images OFF the repository and GitHub artifacts:
+        # fetch only inside the ephemeral runner after explicit quota authorization.
+        from reference_character import load_pack, fetch_reference_images, identity_prompt
+        pack = load_pack(official_pack_id)
+        for job in chosen["jobs"]:
+            job["prompt"] = identity_prompt(pack, job["orientation"])
+            # Each official image is normalized to one 512x512 input tile.
+            job["estimated_neurons"] = round(job["estimated_neurons"] + 2 * 5.37, 2)
+        chosen["estimated_neurons"] = round(
+            sum(job["estimated_neurons"] for job in chosen["jobs"]), 2
+        )
     if chosen["estimated_neurons"] > args.max_neurons:
         raise RuntimeError(
             f"Planned {chosen['estimated_neurons']} estimated Neurons exceed "
@@ -297,13 +321,18 @@ def run_generate(args: argparse.Namespace) -> int:
         )
     if chosen["estimated_neurons"] >= FREE_DAILY_NEURONS:
         raise RuntimeError("Plan exceeds daily free allowance; no requests sent")
+    if official_pack_id:
+        reference_images = fetch_reference_images(pack)
     OUT.mkdir(parents=True, exist_ok=True)
     records, previous_hashes, reference = [], {"mobile": [], "desktop": []}, {}
     for job in chosen["jobs"]:
         if job["reference_from_mobile"] and job["concept"] not in reference:
             raise RuntimeError("Mobile image failed automated checks; refusing to generate an unpaired desktop candidate")
         source_bytes = reference.get(job["concept"]) if job["reference_from_mobile"] else None
-        raw = infer(job, account_id, token, reference_image=source_bytes)
+        input_refs = list(reference_images)
+        if source_bytes is not None:
+            input_refs.append(source_bytes)
+        raw = infer(job, account_id, token, reference_images=input_refs)
         quality = inspect_image(
             raw, (job["width"], job["height"]), previous_hashes[job["orientation"]]
         )
