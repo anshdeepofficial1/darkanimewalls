@@ -1,0 +1,197 @@
+/*
+Dark Anime Walls / restrained motion layer
+Built against Unslop's Motion pass: purposeful feedback, short entrances,
+no perpetual animation, parallax, scroll hijacking, or oversized transforms.
+Unslop by Damir Sokolovsky, CC BY 4.0:
+https://github.com/heydamir/unslop
+*/
+:root {
+ --daw-ease:cubic-bezier(.22,1,.36,1);
+ --daw-feedback:160ms;
+ --daw-enter:420ms;
+}
+body.preview-home,body.preview-collection,body.preview-studio {scroll-behavior:smooth;}
+/* Scroll state is a clear, 2px reading cue, not a decorative progress ring. */
+.daw-scroll-progress {
+ position:fixed;left:0;right:0;top:79px;height:2px;
+ z-index:56;pointer-events:none;background:transparent;
+}
+.daw-scroll-progress>span {
+ display:block;width:100%;height:100%;background:var(--da-accent,#d58c76);
+ transform:scaleX(0);transform-origin:0 50%;will-change:transform;
+}
+body.preview-home.motion-scrolled .nav,
+body.preview-collection.motion-scrolled header {
+ background:#101113;box-shadow:0 10px 25px #0003;
+ border-bottom-color:#454346;
+}
+body.preview-home .nav,body.preview-collection header {
+ transition:background-color var(--daw-feedback) var(--daw-ease),
+ border-color var(--daw-feedback) var(--daw-ease),box-shadow var(--daw-feedback) var(--daw-ease);
+}
+/* An entrance is only enabled after the motion controller is ready. No hidden
+   content if scripting is off or reduced-motion is requested. */
+body.preview-home.motion-ready .reveal {
+ opacity:0;transform:translateY(9px);
+ transition:opacity var(--daw-enter) var(--daw-ease),
+ transform var(--daw-enter) var(--daw-ease);
+}
+body.preview-home.motion-ready .reveal.visible {
+ opacity:1;transform:translateY(0);
+}
+body.preview-home.motion-ready .hero-grid>.reveal:nth-child(2) {
+ transition-delay:65ms;
+}
+/* Gallery content enters when it is actually viewed, staggered for at most 6. */
+body.motion-ready.preview-home .grid .card,
+body.motion-ready.preview-collection .gallery .card {
+ opacity:0;transform:translateY(9px);
+ transition:opacity var(--daw-enter) var(--daw-ease),
+ transform var(--daw-enter) var(--daw-ease),
+ border-color var(--daw-feedback) var(--daw-ease);
+ transition-delay:var(--daw-stagger,0ms),var(--daw-stagger,0ms),0ms;
+}
+body.motion-ready.preview-home .grid .card.motion-entered,
+body.motion-ready.preview-collection .gallery .card.motion-entered {
+ opacity:1;transform:translateY(0);
+}
+body.motion-ready.preview-studio .list .item {
+ opacity:0;transform:translateY(8px);
+ transition:opacity var(--daw-enter) var(--daw-ease),
+ transform var(--daw-enter) var(--daw-ease),
+ border-color var(--daw-feedback) var(--daw-ease);
+ transition-delay:var(--daw-stagger,0ms),var(--daw-stagger,0ms),0ms;
+}
+body.motion-ready.preview-studio .list .item.motion-entered {
+ opacity:1;transform:translateY(0);
+}
+/* The hero presents real artwork: one editorial reveal, then user-driven
+   image changes only. No looping float or meaningless parallax. */
+body.preview-home .hero-art .float-card.one,
+body.preview-home .hero-art .phone {
+ transition:border-color var(--daw-feedback) var(--daw-ease);
+}
+body.preview-home .hero-art .float-card.one:hover {border-color:#655e5a;}
+body.preview-home .spotlight-controls {
+ position:absolute;bottom:19px;left:0;z-index:4;
+ display:flex;align-items:center;gap:12px;
+ padding:8px 9px 8px 13px;background:#17181ae8;
+ border:1px solid #3a3b3e;border-radius:9px;
+}
+body.preview-home .spotlight-count {
+ font:500 .72rem/1 var(--da-font);color:var(--da-secondary);
+ font-variant-numeric:tabular-nums;letter-spacing:.04em;
+ white-space:nowrap;
+}
+body.preview-home #spotlightNext {
+ display:inline-flex;align-items:center;gap:12px;
+ min-height:32px;padding:6px 10px;border:1px solid #424346;
+ background:#242527;color:var(--da-text);border-radius:6px;
+ font:600 .76rem/1 var(--da-font);cursor:pointer;
+ transition:background-color var(--daw-feedback) var(--daw-ease),
+ border-color var(--daw-feedback) var(--daw-ease);
+}
+body.preview-home #spotlightNext:hover:not(:disabled) {background:#333437;border-color:#77716d;}
+body.preview-home #spotlightNext:disabled {opacity:.4;cursor:not-allowed;}
+body.preview-home #spotlightNext .spotlight-arrow {
+ display:inline-block;transition:transform var(--daw-feedback) var(--daw-ease);
+}
+body.preview-home #spotlightNext:hover:not(:disabled) .spotlight-arrow {transform:translateX(3px);}
+/* Hover signals the action rather than scaling cards through the whole layout. */
+body.preview-home .discovery-tile .discovery-image img {
+ transition:opacity var(--daw-feedback) var(--daw-ease);
+ transform:none!important;
+}
+body.preview-home .discovery-tile:hover .discovery-image img {opacity:.91;}
+body.preview-home .discovery-tile .discovery-tile-footer span:last-child {
+ display:inline-block;transition:transform var(--daw-feedback) var(--daw-ease);
+}
+body.preview-home .discovery-tile:hover .discovery-tile-footer span:last-child {
+ transform:translate(2px,-2px);
+}
+body.preview-home .card:hover .thumb {
+ transform:none!important;
+}
+body.preview-home .card .thumb,body.preview-collection .card img {
+ transition:opacity var(--daw-feedback) var(--daw-ease);
+}
+body.preview-home .card:hover .thumb,body.preview-collection .card:hover img {opacity:.92;}
+body.preview-home :is(.btn,.cta,.small,.filter,.random-button,.pager-nav,.page-number):active,
+body.preview-collection :is(.action,.download,.collection-pages button):active:not(:disabled),
+body.preview-studio .btn:active {
+ transform:scale(.98);transition:transform 120ms var(--daw-ease);
+}
+body.preview-home .filters .filter.active {
+ transition:background-color var(--daw-feedback) var(--daw-ease),
+ color var(--daw-feedback) var(--daw-ease),border-color var(--daw-feedback) var(--daw-ease);
+}
+body.preview-home .links.is-open {
+ animation:daw-menu-in 190ms var(--daw-ease) both;
+}
+@keyframes daw-menu-in {
+ from {opacity:0;transform:translateY(-7px);}
+ to {opacity:1;transform:translateY(0);}
+}
+/* Preview panel opens and closes as a sheet, without large blurs or springs. */
+body.preview-home .modal.show .modal-card {
+ animation:daw-dialog-in 340ms var(--daw-ease) both;
+}
+body.preview-home .modal.show.is-closing .modal-card {
+ animation:daw-dialog-out 170ms var(--daw-ease) both;
+}
+body.preview-home .modal.show.is-closing {
+ animation:daw-overlay-out 170ms var(--daw-ease) both;
+ pointer-events:none;
+}
+@keyframes daw-dialog-in {
+ from {opacity:0;transform:translateY(10px);}
+ to {opacity:1;transform:translateY(0);}
+}
+@keyframes daw-dialog-out {
+ from {opacity:1;transform:translateY(0);}
+ to {opacity:0;transform:translateY(6px);}
+}
+@keyframes daw-overlay-out {
+ from {opacity:1;}
+ to {opacity:0;}
+}
+/* Calm editor motion: sign-in and control surfaces enter once on visibility. */
+body.preview-studio.motion-ready #loginView:not(.hidden) {
+ animation:daw-dialog-in 370ms var(--daw-ease) both;
+}
+body.preview-studio.motion-ready #studioView:not(.hidden)>.top,
+body.preview-studio.motion-ready #studioView:not(.hidden)>.grid {
+ animation:daw-dialog-in 390ms var(--daw-ease) both;
+}
+body.preview-studio.motion-ready #studioView:not(.hidden)>.grid {animation-delay:45ms;}
+body.preview-studio :is(.chip-btn,.metadata-option,.item,.btn) {
+ transition:border-color var(--daw-feedback) var(--daw-ease),
+ background-color var(--daw-feedback) var(--daw-ease),
+ color var(--daw-feedback) var(--daw-ease);
+}
+/* Respect accessibility settings across CSS, observer and interactive motion. */
+@media(max-width:850px){
+ .daw-scroll-progress {top:69px;}
+ body.preview-home .spotlight-controls {bottom:12px;}
+}
+@media(max-width:580px){
+ body.preview-home .spotlight-controls {bottom:1px;left:0;gap:7px;padding:5px 6px 5px 8px;}
+ body.preview-home #spotlightNext {font-size:.68rem;min-height:29px;padding:5px 7px;gap:6px;}
+ body.preview-home .spotlight-count {font-size:.64rem;}
+}
+@media(prefers-reduced-motion:reduce){
+ body:is(.preview-home,.preview-collection,.preview-studio) {scroll-behavior:auto!important;}
+ body:is(.preview-home,.preview-collection,.preview-studio) *,
+ body:is(.preview-home,.preview-collection,.preview-studio) *::before,
+ body:is(.preview-home,.preview-collection,.preview-studio) *::after {
+   animation:none!important;transition:none!important;scroll-behavior:auto!important;
+ }
+ body.preview-home .reveal,
+ body.preview-home .reveal:not(.visible),
+ body.preview-home .grid .card,
+ body.preview-collection .gallery .card,
+ body.preview-studio .list .item {
+  opacity:1!important;transform:none!important;
+ }
+ .daw-scroll-progress>span {will-change:auto;}
+}
