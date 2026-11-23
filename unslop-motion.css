@@ -42,6 +42,15 @@ body.preview-home.motion-ready .reveal.visible {
 body.preview-home.motion-ready .hero-grid>.reveal:nth-child(2) {
  transition-delay:65ms;
 }
+/* Page introductions and contextual reading sections follow the same 9px rhythm. */
+body.preview-collection.motion-ready .motion-section {
+ opacity:0;transform:translateY(9px);
+ transition:opacity var(--daw-enter) var(--daw-ease),
+ transform var(--daw-enter) var(--daw-ease);
+}
+body.preview-collection.motion-ready .motion-section.motion-section-entered {
+ opacity:1;transform:translateY(0);
+}
 /* Gallery content enters when it is actually viewed, staggered for at most 6. */
 body.motion-ready.preview-home .grid .card,
 body.motion-ready.preview-collection .gallery .card {
