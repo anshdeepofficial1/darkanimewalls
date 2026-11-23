@@ -6,7 +6,7 @@
 
   <title>Dark Anime Walls | 4K Dark Anime Wallpapers for Phone &amp; Desktop</title>
   <meta name="description" content="Explore free dark anime wallpapers for phones and desktop. Browse 9:16 lock screens, 16:9 backgrounds, manga-style art, dark aura and anime character wallpapers in original uploaded quality." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="robots" content="noindex,nofollow,noarchive" />
   <meta name="theme-color" content="#05040a" />
   <meta name="application-name" content="Dark Anime Walls" />
   <meta name="apple-mobile-web-app-title" content="Dark Anime Walls" />
@@ -360,9 +360,10 @@
     }
     .seo-link{color:#a7eaff;text-decoration:underline;text-underline-offset:3px;font-weight:800}.seo-link:hover{color:#fff}
   </style>
+  <link rel="stylesheet" href="/unslop-preview.css?v=1" />
 </head>
 
-<body>
+<body class="preview-home">
   <div class="background-elements" aria-hidden="true">
     <span class="ambient-shape orb"></span>
     <span class="ambient-shape orb"></span>
@@ -375,7 +376,8 @@
   <nav class="nav">
     <div class="container nav-inner">
       <a class="brand" href="#home"><img class="brand-logo" src="/Logo/Logo.png" alt="Dark Anime Walls logo"><span>Dark Anime Walls</span></a>
-      <div class="links">
+      <button class="menu-toggle" id="mobileMenuToggle" type="button" aria-controls="primaryLinks" aria-expanded="false" aria-label="Toggle navigation"><span></span><span></span></button>
+      <div class="links" id="primaryLinks">
         <a href="#drops">Drops</a>
         <a href="#mobile">Mobile</a>
         <a href="#desktop">Desktop</a>
@@ -390,12 +392,12 @@
     <section class="hero">
       <div class="container hero-grid">
         <div class="reveal">
-          <div class="eyebrow"><span class="dot"></span> Daily dark anime wallpaper drops</div>
-          <h1>Premium <span class="grad">4K Anime</span> Wallpapers</h1>
-          <p>A dark anime wallpaper vault for mobile 9:16 lock screens and desktop 16:9 setups. Preview and download wallpapers in original uploaded quality.</p>
+          <div class="eyebrow"><span class="dot"></span> Curated wallpaper drops</div>
+          <h1>Dark anime.<br><span class="grad">Every screen.</span></h1>
+          <p>Discover distinctive 9:16 lock screens and cinematic 16:9 desktop wallpapers. Explore the live collection and download each artwork in its original uploaded quality.</p>
           <div class="actions">
-            <a class="btn primary" href="#drops">Download Wallpapers</a>
-            <a class="btn blue" href="#request">Request Custom Wallpaper</a>
+            <a class="btn primary" href="#drops">Explore wallpapers</a>
+            <a class="btn blue" href="#request">Request a wallpaper</a>
             <a class="btn" href="https://instagram.com/darkanimewalls" target="_blank" rel="noopener">Follow Instagram</a>
           </div>
         </div>
@@ -421,12 +423,12 @@
     <section id="drops" class="section">
       <div class="container">
         <div class="section-head reveal">
-          <div><div class="kicker">Wallpaper Drops</div><h2>Browse the wallpaper vault.</h2></div>
-          <p class="desc">Search by title, filter by category, preview each wallpaper, copy a caption, and download the original-quality file.</p>
+          <div><div class="kicker">Wallpaper Drops</div><h2>Find your next wallpaper.</h2></div>
+          <p class="desc">Explore live uploads by mood or format, open a full-size preview, and save the original-quality artwork.</p>
         </div>
 
         <div class="toolbar reveal">
-          <input id="searchInput" class="search" type="search" placeholder="Search wallpapers: red aura, manga, desktop, mobile..." />
+          <input id="searchInput" class="search" type="search" aria-label="Search wallpapers" placeholder="Search titles, styles, colors, formats..." />
           <div id="filters" class="filters">
             <button class="filter active" data-filter="All">All</button>
             <button class="filter" data-filter="Mobile 9:16">Mobile 9:16</button>
@@ -441,6 +443,7 @@
         </div>
 
         <div id="loader" class="loader">Loading latest wallpapers...</div>
+        <p id="resultCount" class="gallery-count" role="status" aria-live="polite"></p>
         <div id="galleryGrid" class="grid"></div>
         <div id="emptyState" class="empty" style="display:none;">No wallpapers found yet. Check again after the next drop.</div>
       </div>
@@ -451,7 +454,7 @@
         <div class="wallpaper-section-head reveal">
           <div>
             <div class="kicker">Mobile Wallpapers</div>
-            <h3>Lockscreen-ready 9:16 drops.</h3>
+            <h3>Made for the lock screen.</h3>
           </div>
           <p>Vertical wallpapers optimized for phones, Instagram story previews, and daily lock screen changes. <a class="seo-link" href="/mobile-wallpapers.html">See all phone wallpapers ↗</a></p>
         </div>
@@ -464,7 +467,7 @@
         <div class="wallpaper-section-head reveal">
           <div>
             <div class="kicker">Desktop Wallpapers</div>
-            <h3>Cinematic 16:9 widescreen edits.</h3>
+            <h3>A wider point of view.</h3>
           </div>
           <p>Horizontal wallpapers for desktop setups, laptop backgrounds, gaming desks, and cinematic anime-style screens. <a class="seo-link" href="/desktop-wallpapers.html">See all desktop wallpapers ↗</a></p>
         </div>
@@ -476,7 +479,7 @@
       <div class="container split">
         <div class="panel reveal">
           <div class="kicker">Custom Requests</div>
-          <h3>Request your own wallpaper.</h3>
+          <h3>Have a scene in mind?</h3>
           <p>Send your character, mood, format, colors, and extra details for a custom anime-style wallpaper request.</p>
         </div>
 
@@ -499,7 +502,7 @@
     <section id="collabs" class="section">
       <div class="container">
         <div class="section-head reveal">
-          <div><div class="kicker">Promotions & Collaborations</div><h2>Built for anime pages, edit pages, and wallpaper brands.</h2></div>
+          <div><div class="kicker">Promotions & Collaborations</div><h2>For the anime community.</h2></div>
           <p class="desc">Open for shoutouts, wallpaper pack features, story promotions, page collabs, and custom wallpaper requests.</p>
         </div>
         <div class="collabs reveal">
@@ -516,7 +519,7 @@
 
     <section class="section">
       <div class="container">
-        <div class="section-head reveal"><div><div class="kicker">How It Works</div><h2>Download in three simple steps.</h2></div></div>
+        <div class="section-head reveal"><div><div class="kicker">How It Works</div><h2>Find it. Preview it. Keep it.</h2></div></div>
         <div class="steps reveal">
           <div class="mini"><h3>Choose a wallpaper</h3><p>Browse mobile, desktop, manga-style, red aura, blue aura, and latest drops.</p></div>
           <div class="mini"><h3>Preview or download</h3><p>Open a full preview, check resolution and type, then download the wallpaper.</p></div>
@@ -542,7 +545,7 @@
     <div class="modal-card">
       <div class="modal-preview" id="modalPreview"></div>
       <div class="modal-info">
-        <button class="close" id="closeModal" type="button">×</button>
+        <button class="close" id="closeModal" type="button" aria-label="Close wallpaper preview">×</button>
         <div class="tags" id="modalTags"></div>
         <h3 id="modalTitle"></h3>
         <p id="modalDescription"></p>
@@ -684,6 +687,8 @@
     function render() {
       const filtered = getFiltered();
       galleryGrid.innerHTML = filtered.map(cardTemplate).join("");
+      const counter = document.getElementById("resultCount");
+      if (counter) counter.textContent = filtered.length + (filtered.length === 1 ? " wallpaper" : " wallpapers") + " in view";
       emptyState.style.display = filtered.length ? "none" : "block";
       mobileGrid.innerHTML = wallpapers.filter(isMobileWallpaper).map(cardTemplate).join("");
       desktopGrid.innerHTML = wallpapers.filter(isDesktopWallpaper).map(cardTemplate).join("");
@@ -822,6 +827,18 @@
     }, { threshold: .12 });
     document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
 
+    const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+    const mobileMenu = document.getElementById("primaryLinks");
+    if (mobileMenuToggle && mobileMenu) {
+      mobileMenuToggle.addEventListener("click", () => {
+        const isOpen = mobileMenu.classList.toggle("is-open");
+        mobileMenuToggle.setAttribute("aria-expanded", String(isOpen));
+      });
+      mobileMenu.querySelectorAll("a").forEach(link => link.addEventListener("click", () => {
+        mobileMenu.classList.remove("is-open");
+        mobileMenuToggle.setAttribute("aria-expanded", "false");
+      }));
+    }
     loadWallpapers();
   </script>
 </body>
