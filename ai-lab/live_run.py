@@ -8,9 +8,13 @@ import lab
 
 def run_request(path: Path) -> int:
     request = json.loads(path.read_text(encoding="utf-8"))
-    permitted = {"enabled", "model", "count", "max_neurons", "mobile_only"}
-    if set(request) != permitted:
-        raise ValueError("live-request.json keys must match documented schema exactly")
+    required = {"enabled", "model", "count", "max_neurons", "mobile_only"}
+    permitted = required | {"reference_pack"}
+    if not required.issubset(request) or set(request) - permitted:
+        raise ValueError("live-request.json keys must match documented schema")
+    pack_id = request.get("reference_pack")
+    if pack_id not in (None, "", "gojo-adult-s1", "gojo-young-s2"):
+        raise ValueError("Unsupported official character reference pack")
     if request["enabled"] is not True:
         print("LAB DISARMED: no image inference, website upload or social posting")
         return 0
@@ -28,6 +32,8 @@ def run_request(path: Path) -> int:
         request["count"] != 1 or request["mobile_only"] is not True
     ):
         raise ValueError("Lucid benchmark is limited to one 9:16 portrait")
+    if pack_id and (request["model"] != "klein" or request["count"] != 1):
+        raise ValueError("Official references are limited to one Klein concept")
     cap = 5200 if request["model"] == "lucid" else 900
     if (
         not isinstance(request["max_neurons"], (int, float))
@@ -41,6 +47,7 @@ def run_request(path: Path) -> int:
         count=request["count"],
         max_neurons=request["max_neurons"],
         mobile_only=request["mobile_only"],
+        reference_pack=pack_id,
     ))
 
 
