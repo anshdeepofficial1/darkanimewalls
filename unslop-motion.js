@@ -23,6 +23,12 @@
     track.append(bar);
     body.append(track);
 
+    const sectionLinks = isHome
+      ? Array.from(document.querySelectorAll('.links a[href^="#"]'))
+          .map(link => ({ link, section: document.querySelector(link.getAttribute("href")) }))
+          .filter(entry => entry.section)
+      : [];
+    let currentSection = "";
     let frame = 0;
     const updateScroll = () => {
       frame = 0;
@@ -30,6 +36,20 @@
       const progress = maxScroll ? Math.min(1, Math.max(0, window.scrollY / maxScroll)) : 0;
       bar.style.transform = "scaleX(" + progress.toFixed(4) + ")";
       body.classList.toggle("motion-scrolled", window.scrollY > 32);
+      if (sectionLinks.length) {
+        const cutoff = window.scrollY + Math.min(window.innerHeight * 0.37, 260);
+        const active = sectionLinks.filter(({section}) => section.offsetTop <= cutoff).at(-1);
+        const nextSection = active ? active.section.id : "";
+        if (nextSection !== currentSection) {
+          currentSection = nextSection;
+          sectionLinks.forEach(({link, section}) => {
+            const selected = section.id === nextSection;
+            link.classList.toggle("is-current", selected);
+            if (selected) link.setAttribute("aria-current", "location");
+            else link.removeAttribute("aria-current");
+          });
+        }
+      }
     };
     const requestScrollUpdate = () => {
       if (!frame) frame = requestAnimationFrame(updateScroll);
