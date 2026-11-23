@@ -35,6 +35,16 @@ const $ = id => document.getElementById(id);
 const smooth = () => reduce.matches ? "auto" : "smooth";
 const isDesktop = w => /desktop/i.test(String(w.type || "")) || Number(w.width) > Number(w.height);
 const isMobile = w => /mobile/i.test(String(w.type || "")) || Number(w.height) > Number(w.width);
+// Optimized display assets are never used for original-quality downloads.
+const displayUrl = (w, width=640) => {
+  try {
+    const url=new URL(w.imageUrl);
+    if(url.protocol!=="https:" || url.hostname!=="res.cloudinary.com" || !url.pathname.includes("/image/upload/"))return w.imageUrl;
+    const transform="f_auto,q_auto:good,c_limit,w_"+Math.min(1200,Math.max(320,Math.round(width)));
+    url.pathname=url.pathname.replace("/image/upload/","/image/upload/"+transform+"/");
+    return url.toString();
+  } catch {return w.imageUrl}
+};
 const fileUrl = w => "/api/download?url=" + encodeURIComponent(w.downloadUrl || w.imageUrl || "")
   + "&name=" + encodeURIComponent(w.downloadName || "wallpaper");
 const safe = s => String(s == null ? "" : s);
@@ -102,7 +112,7 @@ function createCard(w, i=0) {
   const article = make("article", { class:"art-card", "data-format":isDesktop(w)?"desktop":"mobile" });
   const imageBtn = make("button", { class:"card-image", type:"button", "aria-label":"Preview " + safe(w.title || "wallpaper") });
   const img = make("img", {
-    src:w.imageUrl, alt:(w.title || "Dark anime") + (isDesktop(w) ? " desktop wallpaper" : " phone wallpaper"),
+    src:displayUrl(w, isDesktop(w) ? 720 : 540), alt:(w.title || "Dark anime") + (isDesktop(w) ? " desktop wallpaper" : " phone wallpaper"),
     loading:i < 2 && page === "home" ? "eager" : "lazy", decoding:"async",
     width:safe(w.width || 1080), height:safe(w.height || 1920)
   });
@@ -269,11 +279,11 @@ function renderHero() {
   const desktop=landscape[spotlight%landscape.length]||mobile;
   const poster=$("heroDesktopImage"),phone=$("heroMobileImage");
   if(poster&&desktop){
-    poster.src=desktop.imageUrl;poster.alt=(desktop.title||"Dark anime")+" desktop wallpaper";
+    poster.src=displayUrl(desktop, 1000);poster.alt=(desktop.title||"Dark anime")+" desktop wallpaper";
     $("heroDesktopTitle").textContent=desktop.title||"Widescreen wallpaper";
   }
   if(phone&&mobile){
-    phone.src=mobile.imageUrl;phone.alt=(mobile.title||"Dark anime")+" mobile wallpaper";
+    phone.src=displayUrl(mobile, 600);phone.alt=(mobile.title||"Dark anime")+" mobile wallpaper";
   }
   if($("spotlightCount"))$("spotlightCount").textContent=String(total?spotlight+1:0).padStart(2,"0")+" / "+String(total).padStart(2,"0");
   if($("spotlightNext"))$("spotlightNext").disabled=total<2;
@@ -291,8 +301,8 @@ $("spotlightNext")?.addEventListener("click",()=>{
 function renderCategoryTiles(){
   const phone=wallpapers.find(w=>isMobile(w)&&w.imageUrl);
   const desktop=wallpapers.find(w=>isDesktop(w)&&w.imageUrl);
-  if(phone&&$("tilePhone")){$("tilePhone").src=phone.imageUrl;$("tilePhone").alt=""}
-  if(desktop&&$("tileDesktop")){$("tileDesktop").src=desktop.imageUrl;$("tileDesktop").alt=""}
+  if(phone&&$("tilePhone")){$("tilePhone").src=displayUrl(phone, 720);$("tilePhone").alt=""}
+  if(desktop&&$("tileDesktop")){$("tileDesktop").src=displayUrl(desktop, 1000);$("tileDesktop").alt=""}
   if($("tilePhoneCount"))$("tilePhoneCount").textContent=wallpapers.filter(isMobile).length+" wallpapers";
   if($("tileDesktopCount"))$("tileDesktopCount").textContent=wallpapers.filter(isDesktop).length+" wallpapers";
 }
