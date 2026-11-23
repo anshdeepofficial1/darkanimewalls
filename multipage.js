@@ -40,7 +40,7 @@ const displayUrl = (w, width=640) => {
   try {
     const url=new URL(w.imageUrl);
     if(url.protocol!=="https:" || url.hostname!=="res.cloudinary.com" || !url.pathname.includes("/image/upload/"))return w.imageUrl;
-    const transform="f_auto,q_auto:good,c_limit,w_"+Math.min(1200,Math.max(320,Math.round(width)));
+    const transform="c_limit,w_"+Math.min(1200,Math.max(320,Math.round(width)))+"/q_auto:good/f_auto";
     url.pathname=url.pathname.replace("/image/upload/","/image/upload/"+transform+"/");
     return url.toString();
   } catch {return w.imageUrl}
