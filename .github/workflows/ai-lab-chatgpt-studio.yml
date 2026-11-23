@@ -1,0 +1,47 @@
+name: Dark Anime AI Lab — ChatGPT Images quality review
+
+on:
+  push:
+    branches:
+      - lab/premium-wallpaper-engine
+    paths:
+      - "ai-lab/chatgpt-studio/**"
+      - ".github/workflows/ai-lab-chatgpt-studio.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dark-anime-chatgpt-studio-check
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: Offline import checks — NO PUBLISHING
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install isolated lab dependencies
+        run: python -m pip install --disable-pip-version-check -r ai-lab/requirements.txt
+      - name: Verify image QA and publication safeguards
+        run: python -m unittest discover -s ai-lab/chatgpt-studio/tests -v
+      - name: Review any real ChatGPT Images candidates (never generate or publish)
+        run: python ai-lab/chatgpt-studio/review.py
+      - name: Store review report and accepted uploaded candidates as an Actions artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dark-anime-chatgpt-review-${{ github.run_id }}
+          path: ai-lab/chatgpt-studio/out/**
+          retention-days: 7
+          if-no-files-found: ignore
+      - name: Confirm safety boundary
+        if: always()
+        run: |
+          echo "## ChatGPT Studio — Review only" >> "$GITHUB_STEP_SUMMARY"
+          echo "No API image inference, no ChatGPT sign-in automation, no Cloudinary upload, no Instagram posting, no Vercel deployment." >> "$GITHUB_STEP_SUMMARY"
+          echo "The repo is PUBLIC: any uploaded image committed to this branch becomes publicly visible in GitHub. Review locally if you need private staging." >> "$GITHUB_STEP_SUMMARY"
