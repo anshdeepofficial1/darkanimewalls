@@ -148,6 +148,9 @@ class APITests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "denied model access"):
             lab.infer(job, "account", "token")
         self.assertEqual(post.call_count, 1)
+        self.assertIsInstance(post.call_args.kwargs["json"]["width"], int)
+        self.assertIsInstance(post.call_args.kwargs["json"]["height"], int)
+        self.assertIsInstance(post.call_args.kwargs["json"]["seed"], int)
 
     @mock.patch.object(lab.requests, "post")
     def test_missing_secrets_fails_without_inference(self, post):
