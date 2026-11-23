@@ -1,5 +1,5 @@
 {
-  "enabled": false,
+  "enabled": true,
   "model": "klein",
   "count": 1,
   "max_neurons": 300,
