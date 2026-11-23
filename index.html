@@ -361,6 +361,8 @@
     .seo-link{color:#a7eaff;text-decoration:underline;text-underline-offset:3px;font-weight:800}.seo-link:hover{color:#fff}
   </style>
   <link rel="stylesheet" href="/unslop-preview.css?v=1" />
+  <link rel="stylesheet" href="/unslop-motion.css?v=1" />
+  <script src="/unslop-motion.js?v=1" defer></script>
 </head>
 
 <body class="preview-home">
@@ -415,6 +417,12 @@
           <div class="float-card two">
             <div id="heroAccentImage" class="float-img"></div>
             <div class="float-label"><span id="heroAccentType">Manga Style</span><span id="heroAccentDetail">Red Glow</span></div>
+          </div>
+          <div class="spotlight-controls" aria-label="Featured artwork">
+            <span class="spotlight-count" id="spotlightCount" aria-live="polite">01 / 05</span>
+            <button id="spotlightNext" type="button" aria-label="Show another featured wallpaper" disabled>
+              Next artwork <span class="spotlight-arrow" aria-hidden="true">→</span>
+            </button>
           </div>
         </div>
       </div>
@@ -589,7 +597,7 @@
     </div>
   </footer>
 
-  <div class="modal" id="previewModal">
+  <div class="modal" id="previewModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
     <div class="modal-card">
       <div class="modal-preview" id="modalPreview"></div>
       <div class="modal-info">
@@ -616,6 +624,8 @@
     let wallpapers = [];
     let currentFilter = "All";
     let activeWallpaper = null;
+    let spotlightIndex = 0;
+    let spotlightChanging = false;
     let currentPage = 1;
     const PAGE_SIZE = 9;
 
@@ -719,16 +729,28 @@
       element.style.backgroundPosition = "center";
     }
 
+    function getSpotlightCollection() {
+      const mobiles = wallpapers.filter(w => w.imageUrl && isMobileWallpaper(w));
+      const desktops = wallpapers.filter(w => w.imageUrl && isDesktopWallpaper(w));
+      const count = Math.min(5, Math.max(mobiles.length, desktops.length));
+      return { mobiles, desktops, count };
+    }
+
     function updateHeroShowcase() {
-      const mobile = wallpapers.find(isMobileWallpaper) || wallpapers[0];
-      const nonMobile = wallpapers.filter(w => w.public_id !== mobile?.public_id);
-      const desktop = nonMobile.find(isDesktopWallpaper) || nonMobile[0] || mobile;
+      const { mobiles, desktops, count } = getSpotlightCollection();
+      const mobile = mobiles.length ? mobiles[spotlightIndex % mobiles.length] : wallpapers[spotlightIndex % (wallpapers.length || 1)];
+      const desktop = desktops.length ? desktops[spotlightIndex % desktops.length] : mobile;
       const accent = wallpapers.find(w => w.public_id !== mobile?.public_id && w.public_id !== desktop?.public_id)
-        || desktop
-        || mobile;
+        || desktop || mobile;
+      const counter = document.getElementById("spotlightCount");
+      const next = document.getElementById("spotlightNext");
+      if (counter) counter.textContent = String(count ? spotlightIndex + 1 : 0).padStart(2, "0")
+        + " / " + String(count).padStart(2, "0");
+      if (next) next.disabled = spotlightChanging || count < 2;
 
       if (mobile?.imageUrl) {
-        heroMobileImage.src = mobile.imageUrl;
+        if (heroMobileImage.src !== mobile.imageUrl) heroMobileImage.src = mobile.imageUrl;
+        heroMobileImage.alt = (mobile.title || "Anime") + " mobile wallpaper preview";
         heroMobileImage.classList.add("show");
       } else {
         heroMobileImage.removeAttribute("src");
@@ -736,16 +758,41 @@
       }
 
       heroMobileType.textContent = mobile?.type || "Mobile 9:16";
-      heroMobileTitle.textContent = mobile?.title || "Dark Aura Lockscreen";
+      heroMobileTitle.textContent = mobile?.title || "Dark Anime";
 
       setHeroCardImage(heroDesktopImage, desktop);
       heroDesktopType.textContent = desktop?.type || "Desktop 16:9";
-      heroDesktopDetail.textContent = desktop?.category || "Blue Aura";
+      heroDesktopDetail.textContent = desktop?.category || "Dark Anime";
 
       setHeroCardImage(heroAccentImage, accent);
       heroAccentType.textContent = accent?.type || "Manga Style";
-      heroAccentDetail.textContent = accent?.category || "Red Glow";
+      heroAccentDetail.textContent = accent?.category || "Dark Anime";
     }
+
+    // A visitor-controlled gallery spotlight. Artwork never rotates on a timer.
+    document.getElementById("spotlightNext").addEventListener("click", async () => {
+      const { mobiles, desktops, count } = getSpotlightCollection();
+      if (count < 2 || spotlightChanging) return;
+      spotlightChanging = true;
+      const nextIndex = (spotlightIndex + 1) % count;
+      const imageUrls = [
+        mobiles[nextIndex % (mobiles.length || 1)]?.imageUrl,
+        desktops[nextIndex % (desktops.length || 1)]?.imageUrl
+      ].filter(Boolean);
+      // A short preload avoids flashing empty wallpaper frames on slower links.
+      const preload = Promise.all(imageUrls.map(src => new Promise(resolve => {
+        const img = new Image();
+        img.onload = resolve;
+        img.onerror = resolve;
+        img.src = src;
+        if (img.complete) resolve();
+      })));
+      await Promise.race([preload, new Promise(resolve => setTimeout(resolve, 1400))]);
+      spotlightIndex = nextIndex;
+      spotlightChanging = false;
+      updateHeroShowcase();
+      window.dispatchEvent(new CustomEvent("daw:spotlight-changed"));
+    });
 
     function updateDiscoveryTiles() {
       const sets = [
@@ -878,23 +925,46 @@
       });
     }
 
+    let previewClosingTimer = 0;
+    let previewReturnFocus = null;
+
     function openPreview(publicId) {
       const w = wallpapers.find(item => item.public_id === publicId);
       if (!w) return;
+      clearTimeout(previewClosingTimer);
+      modal.classList.remove("is-closing");
+      previewReturnFocus = document.activeElement;
       activeWallpaper = w;
       modalPreview.innerHTML = `<img class="${isDesktopWallpaper(w) ? "landscape-preview" : "portrait-preview"}" src="${w.imageUrl}" alt="${escapeHtml(w.title)} full preview">`;
       modalTags.innerHTML = `<span class="tag ${tagClass(w.category)}">${escapeHtml(w.category)}</span><span class="tag">${escapeHtml(w.type)}</span><span class="tag">${escapeHtml(w.resolution)}</span>`;
       modalTitle.textContent = w.title;
-      modalDescription.textContent = w.description || "Premium dark anime wallpaper.";
+      modalDescription.textContent = w.description || "Dark anime wallpaper.";
       modalDownload.href = downloadHref(w);
       modalDownload.setAttribute("download", "");
       modal.classList.add("show");
+      modal.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
+      closeModal.focus({ preventScroll: true });
+    }
+
+    function finishClosePreview() {
+      modal.classList.remove("show", "is-closing");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      if (previewReturnFocus && previewReturnFocus.isConnected) {
+        previewReturnFocus.focus({ preventScroll: true });
+      }
+      previewReturnFocus = null;
     }
 
     function closePreview() {
-      modal.classList.remove("show");
-      document.body.style.overflow = "";
+      if (!modal.classList.contains("show") || modal.classList.contains("is-closing")) return;
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        finishClosePreview();
+      } else {
+        modal.classList.add("is-closing");
+        previewClosingTimer = setTimeout(finishClosePreview, 170);
+      }
     }
 
     closeModal.addEventListener("click", closePreview);
