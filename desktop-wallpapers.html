@@ -43,17 +43,57 @@ footer{padding:30px 0;border-top:1px solid #ffffff1e;color:#b7b4ca}
 <header><nav class="wrap"><a class="brand" href="/"><img src="/Logo/Logo.png" width="42" height="42" alt="Dark Anime Walls logo"/>Dark Anime Walls</a><div class="links"><a href="/">Home</a><a href="/mobile-wallpapers.html">Phone</a><a href="/desktop-wallpapers.html">Desktop</a></div></nav></header>
 <main class="wrap">
 <section class="hero"><div class="kicker">Dark Anime Walls · 16:9 Desktop Wallpapers</div><h1>Art for the bigger screen.</h1><p class="copy">Discover dark anime wallpapers for PC, laptop and widescreen monitors. Browse cinematic 16:9 backgrounds, black anime art, glowing characters and dark manga-style images. Download the original files from the live gallery.</p><div class="actions"><a class="action" href="#gallery">Browse widescreen art</a><a class="action alt" href="/#request">Request Wallpaper</a></div></section>
-<section id="gallery"><div class="headrow"><div><h2>The widescreen collection</h2><p class="copy">Original uploaded quality · Free downloads</p></div><input id="query" aria-label="Search wallpapers" type="search" placeholder="Search anime, girl, boy, aura..." /></div>
-<p role="status" aria-live="polite" id="status">Loading wallpapers...</p><div id="items" class="gallery"></div></section>
+<section id="gallery"><div class="headrow"><div><h2>The widescreen collection</h2><p class="copy">Original uploaded quality · Free downloads</p></div><div class="collection-controls"><input id="query" aria-label="Search wallpapers" type="search" placeholder="Search title, character, or mood..." /><label class="sr-only" for="collectionSort">Sort wallpapers</label><select id="collectionSort" aria-label="Sort wallpapers"><option value="latest">Newest first</option><option value="oldest">Oldest first</option><option value="az">Title A–Z</option></select></div></div>
+<p role="status" aria-live="polite" id="status">Loading wallpapers...</p><div id="items" class="gallery"></div><nav id="collectionPagination" class="collection-pagination" aria-label="Gallery pages"></nav></section>
 <section class="info"><h2>How to choose a dark anime desktop background</h2><p>Most widescreen monitors use 16:9 images. Check the available resolution before downloading a wallpaper for your setup.</p><p>Looking for dark anime girl or boy wallpapers, black wallpapers or manga-style themes? Search the published collection using the field above. Only currently available wallpapers will appear.</p><p>Visit the <a href="/">full Dark Anime Walls gallery</a> or browse <a href="/mobile-wallpapers.html">phone wallpapers</a>.</p></section>
 </main><footer><div class="wrap">© 2026 Dark Anime Walls · Original and fan-style anime wallpaper designs. Not affiliated with anime studios.</div></footer>
 <script>
 (()=>{"use strict";
 const mode="desktop",container=document.getElementById("items"),status=document.getElementById("status"),query=document.getElementById("query");let all=[];
 function matches(w){const t=String(w.type||"").toLowerCase();return mode==="mobile"?(t.includes("mobile")||Number(w.height)>Number(w.width)):(t.includes("desktop")||Number(w.width)>Number(w.height))}
-function render(){const q=query.value.trim().toLowerCase();const shown=all.filter(w=>[w.title,w.category,w.type,w.mood,w.description,...(w.extraTags||[])].join(" ").toLowerCase().includes(q));container.replaceChildren();status.textContent=shown.length?shown.length+" wallpapers available":"No matching wallpapers published yet.";
-for(const w of shown){if(!w.imageUrl)continue;const card=document.createElement("article");card.className="card";const preview=document.createElement("a");preview.href=w.imageUrl;preview.target="_blank";preview.rel="noopener noreferrer";const img=document.createElement("img");img.src=w.imageUrl;img.alt=(w.title||"Dark anime")+" desktop wallpaper";img.loading="lazy";img.decoding="async";img.width=w.width||1080;img.height=w.height||1920;preview.append(img);const body=document.createElement("div");body.className="details";const h=document.createElement("h3");h.textContent=w.title||"Dark anime wallpaper";const meta=document.createElement("p");meta.textContent=[w.category,w.resolution].filter(Boolean).join(" · ");const dl=document.createElement("a");dl.className="download";dl.href="/api/download?url="+encodeURIComponent(w.downloadUrl||w.imageUrl)+"&name="+encodeURIComponent(w.downloadName||"wallpaper");dl.download="";dl.textContent="Download";body.append(h,meta,dl);card.append(preview,body);container.append(card)}}
-query.addEventListener("input",render);
+const PAGE_SIZE=12,pagination=document.getElementById("collectionPagination"),sort=document.getElementById("collectionSort");let page=1;
+function renderPagination(total){
+  const count=Math.ceil(total/PAGE_SIZE);
+  if(count<=1){pagination.replaceChildren();return}
+  const nav=document.createElement("div");nav.className="collection-pages";
+  const prev=document.createElement("button");prev.type="button";prev.textContent="Previous";prev.disabled=page===1;prev.dataset.page=String(page-1);nav.append(prev);
+  const marker=document.createElement("span");marker.className="collection-page-label";marker.textContent="Page "+page+" of "+count;nav.append(marker);
+  const next=document.createElement("button");next.type="button";next.textContent="Next";next.disabled=page===count;next.dataset.page=String(page+1);nav.append(next);
+  pagination.replaceChildren(nav);
+}
+function render(){
+ const q=query.value.trim().toLowerCase();
+ const shown=all.filter(w=>[w.title,w.category,w.type,w.mood,w.description,...(w.extraTags||[])].join(" ").toLowerCase().includes(q));
+ if(sort.value==="az")shown.sort((a,b)=>String(a.title||"").localeCompare(String(b.title||"")));
+ else if(sort.value==="oldest")shown.sort((a,b)=>new Date(a.createdAt||0)-new Date(b.createdAt||0));
+ else shown.sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+ const pages=Math.max(1,Math.ceil(shown.length/PAGE_SIZE));page=Math.min(Math.max(1,page),pages);
+ const start=(page-1)*PAGE_SIZE;
+ container.replaceChildren();
+ status.textContent=shown.length?"Showing "+(start+1)+"–"+Math.min(start+PAGE_SIZE,shown.length)+" of "+shown.length+" wallpapers":"No matching wallpapers published yet.";
+ for(const w of shown.slice(start,start+PAGE_SIZE)){
+  if(!w.imageUrl)continue;
+  const card=document.createElement("article");card.className="card";
+  const preview=document.createElement("a");preview.href=w.imageUrl;preview.target="_blank";preview.rel="noopener noreferrer";
+  const img=document.createElement("img");img.src=w.imageUrl;img.alt=(w.title||"Dark anime")+" "+mode+" wallpaper";img.loading="lazy";img.decoding="async";img.width=w.width||1080;img.height=w.height||1920;preview.append(img);
+  const body=document.createElement("div");body.className="details";
+  const h=document.createElement("h3");h.textContent=w.title||"Dark anime wallpaper";
+  const meta=document.createElement("p");meta.textContent=[w.category,w.resolution].filter(Boolean).join(" · ");
+  const dl=document.createElement("a");dl.className="download";dl.href="/api/download?url="+encodeURIComponent(w.downloadUrl||w.imageUrl)+"&name="+encodeURIComponent(w.downloadName||"wallpaper");dl.download="";dl.textContent="Download";
+  body.append(h,meta,dl);card.append(preview,body);container.append(card);
+ }
+ renderPagination(shown.length);
+}
+pagination.addEventListener("click",event=>{
+ const btn=event.target.closest("button[data-page]");if(!btn||btn.disabled)return;
+ const target=Number(btn.dataset.page);
+ if(!Number.isInteger(target)||target<1||target>Math.ceil(all.length/PAGE_SIZE))return;
+ page=target;render();
+ document.getElementById("gallery").scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+});
+query.addEventListener("input",()=>{page=1;render()});
+sort.addEventListener("change",()=>{page=1;render()});
+
 fetch("/api/wallpapers").then(r=>{if(!r.ok)throw Error("unavailable");return r.json()}).then(data=>{all=(Array.isArray(data.wallpapers)?data.wallpapers:[]).filter(matches);render()}).catch(()=>status.textContent="Wallpapers are temporarily unavailable. Try again soon.");
 })();
 </script></body></html>
