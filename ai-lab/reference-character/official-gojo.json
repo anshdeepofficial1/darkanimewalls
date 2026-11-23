@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "status": "INTERNAL_BENCHMARK_ONLY",
+  "note": "Source art is copyright of the respective rightsholders. References are fetched ephemerally for private evaluation. Do not commit images, redistribute source art, or publish derivative wallpapers without rights review.",
+  "packs": [
+    {
+      "id": "gojo-adult-s1",
+      "character": "Satoru Gojo",
+      "anime": "Jujutsu Kaisen",
+      "variant": "Season 1 adult / black blindfold",
+      "source_page": "https://jujutsukaisen.jp/character/index_1st.php",
+      "rights": "© Gege Akutami / Shueisha / JUJUTSU KAISEN Production Committee",
+      "identity_anchors": [
+        "upright spiky short silver-white hair, not long bangs",
+        "black blindfold fully covers both eyes",
+        "purple-black tall zip-up collar",
+        "mature slender facial proportions",
+        "single subject, crisp 2D anime cel shading"
+      ],
+      "references": [
+        {
+          "role": "full_body_design",
+          "url": "https://jujutsukaisen.jp/images/chara_detail4.png"
+        },
+        {
+          "role": "facial_design",
+          "url": "https://jujutsukaisen.jp/images/chara_category1/chara_face7.jpg"
+        }
+      ]
+    },
+    {
+      "id": "gojo-young-s2",
+      "character": "Satoru Gojo",
+      "anime": "Jujutsu Kaisen",
+      "variant": "Hidden Inventory teenage Gojo / round blue sunglasses",
+      "source_page": "https://jujutsukaisen.jp/character/index_2nd.php",
+      "rights": "© Gege Akutami / Shueisha / JUJUTSU KAISEN Production Committee",
+      "identity_anchors": [
+        "spiky silver-white hair with sharp anime strands",
+        "round indigo-blue sunglasses",
+        "navy school uniform with buttoned high collar",
+        "youthful face shape",
+        "single subject, crisp 2D anime cel shading"
+      ],
+      "references": [
+        {
+          "role": "full_body_design",
+          "url": "https://jujutsukaisen.jp/images/chara_detail1_2nd.png"
+        },
+        {
+          "role": "facial_design",
+          "url": "https://jujutsukaisen.jp/images/chara_face1_2nd.jpg"
+        }
+      ]
+    }
+  ]
+}
