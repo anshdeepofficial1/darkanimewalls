@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>https://darkanimewalls.vercel.app/</loc></url>
-<url><loc>https://darkanimewalls.vercel.app/mobile-wallpapers.html</loc></url>
-<url><loc>https://darkanimewalls.vercel.app/desktop-wallpapers.html</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/explore.html</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/mobile-wallpapers.html</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/desktop-wallpapers.html</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/request.html</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/collaborations.html</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/about.html</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/contact.html</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/faq.html</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/privacy.html</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/terms.html</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/copyright.html</loc></url>
+  <url><loc>https://darkanimewalls.vercel.app/cookies.html</loc></url>
 </urlset>
