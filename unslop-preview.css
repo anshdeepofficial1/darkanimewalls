@@ -634,6 +634,44 @@ body.preview-home .pager-ellipsis {color:var(--da-muted);padding:0 3px;}
   body.preview-home .pager-controls .pager-nav {min-width:82px;}
 }
 
+
+/* Short, paginated archives use the same gallery system. */
+body.preview-collection .collection-controls {
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+body.preview-collection .collection-controls input {flex:1 1 230px;}
+body.preview-collection .collection-controls select {
+  height:50px;min-height:50px;min-width:145px;padding:0 12px;
+  border:1px solid var(--da-line);border-radius:9px;background:var(--da-surface);
+  color:var(--da-text);font:500 .85rem var(--da-font);
+}
+body.preview-collection .collection-pagination {
+  border-top:1px solid var(--da-line);padding-top:24px;margin:-35px 0 85px;
+}
+body.preview-collection .collection-pagination:empty {display:none;}
+body.preview-collection .collection-pages {
+  display:flex;align-items:center;justify-content:center;gap:20px;
+}
+body.preview-collection .collection-pages button {
+  border:1px solid #3b3c3f;background:var(--da-surface);color:var(--da-text);
+  border-radius:8px;padding:10px 16px;min-height:41px;
+  font:500 .85rem var(--da-font);cursor:pointer;
+}
+body.preview-collection .collection-pages button:hover:not(:disabled) {border-color:#817e79;background:#292a2c;}
+body.preview-collection .collection-pages button:disabled {opacity:.36;cursor:not-allowed;}
+body.preview-collection .collection-page-label {
+  color:var(--da-muted);font-size:.8rem;font-variant-numeric:tabular-nums;
+}
+body.preview-collection #gallery {scroll-margin-top:110px;}
+@media(max-width:580px) {
+  body.preview-collection .collection-controls {display:grid;width:100%;grid-template-columns:1fr;}
+  body.preview-collection .collection-controls input {width:100%;min-width:0;}
+  body.preview-collection .collection-controls select {width:100%;}
+  body.preview-collection .collection-pages {gap:10px;justify-content:space-between;}
+  body.preview-collection .collection-pages button {padding:9px 13px;}
+  body.preview-collection .collection-page-label {font-size:.73rem;}
+}
+
 /* Editorial navigation and real gallery count. */
 body.preview-home .menu-toggle {display:none;width:40px;height:40px;padding:10px;border:1px solid var(--da-line);border-radius:8px;background:#1a1b1d;color:var(--da-text);cursor:pointer;}
 body.preview-home .menu-toggle span {display:block;width:18px;height:1.5px;background:currentColor;margin:5px auto;border-radius:1px;}
