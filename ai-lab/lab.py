@@ -183,8 +183,23 @@ def infer(
         else:
             if reference_image is not None:
                 raise ValueError("Lucid Origin endpoint has no reference image parameter")
+            # JSON models require numeric values, unlike multipart form fields.
+            fields["width"] = int(job["width"])
+            fields["height"] = int(job["height"])
+            fields["seed"] = int(job["seed"])
             fields["num_steps"] = 28
             response = requests.post(url, json=fields, headers=headers, timeout=timeout)
+        if response.status_code == 400:
+            try:
+                error_items = response.json().get("errors", [])
+                messages = [
+                    str(e.get("message", ""))[:160]
+                    for e in error_items[:2] if isinstance(e, dict)
+                ]
+            except (ValueError, AttributeError, TypeError):
+                messages = []
+            raise RuntimeError("Cloudflare rejected image parameters (400): " +
+                               "; ".join(messages or ["no detail returned"]))
         if response.status_code == 403:
             raise RuntimeError("Cloudflare denied model access (possibly paid-plan-only); stopping.")
         if response.status_code == 429:
