@@ -427,9 +427,50 @@
           <p class="desc">Explore live uploads by mood or format, open a full-size preview, and save the original-quality artwork.</p>
         </div>
 
+        <div class="discovery-index reveal" aria-label="Explore by wallpaper format">
+          <div class="discovery-index-head">
+            <span class="discovery-overline">Choose your canvas</span>
+            <span>Start with a screen size, then refine your style</span>
+          </div>
+          <div class="discovery-tiles">
+            <button class="discovery-tile discovery-tile-phone" data-quick-filter="Mobile 9:16" type="button" aria-label="Explore phone wallpapers">
+              <span class="discovery-image"><img id="discoveryMobileArt" alt="" loading="lazy" decoding="async"></span>
+              <span class="discovery-shade"></span>
+              <span class="discovery-tile-copy">
+                <span class="discovery-tile-kicker">9:16 · Mobile</span>
+                <strong>For the lock screen</strong>
+                <span class="discovery-tile-footer"><span id="discoveryMobileCount">Browse phone wallpapers</span><span aria-hidden="true">↗</span></span>
+              </span>
+            </button>
+            <button class="discovery-tile discovery-tile-desktop" data-quick-filter="Desktop 16:9" type="button" aria-label="Explore desktop wallpapers">
+              <span class="discovery-image"><img id="discoveryDesktopArt" alt="" loading="lazy" decoding="async"></span>
+              <span class="discovery-shade"></span>
+              <span class="discovery-tile-copy">
+                <span class="discovery-tile-kicker">16:9 · Desktop</span>
+                <strong>For the bigger picture</strong>
+                <span class="discovery-tile-footer"><span id="discoveryDesktopCount">Browse desktop wallpapers</span><span aria-hidden="true">↗</span></span>
+              </span>
+            </button>
+          </div>
+        </div>
+
         <div class="toolbar reveal">
-          <input id="searchInput" class="search" type="search" aria-label="Search wallpapers" placeholder="Search titles, styles, colors, formats..." />
-          <div id="filters" class="filters">
+          <div class="gallery-tools">
+            <label class="gallery-search-label" for="searchInput">
+              <span class="sr-only">Search wallpapers</span>
+              <input id="searchInput" class="search" type="search" placeholder="Search by character, mood, or title..." autocomplete="off" />
+            </label>
+            <div class="gallery-sort">
+              <label for="sortSelect">Sort by</label>
+              <select id="sortSelect" aria-label="Sort wallpapers">
+                <option value="latest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="az">Title A–Z</option>
+              </select>
+            </div>
+          </div>
+          <div class="discovery-filter-heading"><span>Explore styles</span><span>Refine your collection</span></div>
+          <div id="filters" class="filters" aria-label="Filter wallpapers by type or style">
             <button class="filter active" data-filter="All">All</button>
             <button class="filter" data-filter="Mobile 9:16">Mobile 9:16</button>
             <button class="filter" data-filter="Desktop 16:9">Desktop 16:9</button>
@@ -442,10 +483,17 @@
           </div>
         </div>
 
+        <div class="gallery-results-head" id="galleryResults">
+          <div>
+            <div class="kicker">The wallpaper archive</div>
+            <h3 id="resultsHeading">Latest from the vault</h3>
+          </div>
+          <p id="resultCount" class="gallery-count" role="status" aria-live="polite"></p>
+        </div>
         <div id="loader" class="loader">Loading latest wallpapers...</div>
-        <p id="resultCount" class="gallery-count" role="status" aria-live="polite"></p>
         <div id="galleryGrid" class="grid"></div>
-        <div id="emptyState" class="empty" style="display:none;">No wallpapers found yet. Check again after the next drop.</div>
+        <div id="emptyState" class="empty" style="display:none;">No wallpapers match your search. Try another style or keyword.</div>
+        <nav id="galleryPagination" class="gallery-pagination" aria-label="Wallpaper pages"></nav>
       </div>
     </section>
 
@@ -456,7 +504,7 @@
             <div class="kicker">Mobile Wallpapers</div>
             <h3>Made for the lock screen.</h3>
           </div>
-          <p>Vertical wallpapers optimized for phones, Instagram story previews, and daily lock screen changes. <a class="seo-link" href="/mobile-wallpapers.html">See all phone wallpapers ↗</a></p>
+          <p>A small edit of recent portrait wallpapers, chosen for your screen. <a class="seo-link" href="/mobile-wallpapers.html">See all phone wallpapers ↗</a></p>
         </div>
         <div id="mobileGrid" class="grid reveal"></div>
       </div>
@@ -469,7 +517,7 @@
             <div class="kicker">Desktop Wallpapers</div>
             <h3>A wider point of view.</h3>
           </div>
-          <p>Horizontal wallpapers for desktop setups, laptop backgrounds, gaming desks, and cinematic anime-style screens. <a class="seo-link" href="/desktop-wallpapers.html">See all desktop wallpapers ↗</a></p>
+          <p>A small edit of recent widescreen wallpapers for your desktop. <a class="seo-link" href="/desktop-wallpapers.html">See all desktop wallpapers ↗</a></p>
         </div>
         <div id="desktopGrid" class="grid reveal"></div>
       </div>
@@ -568,6 +616,8 @@
     let wallpapers = [];
     let currentFilter = "All";
     let activeWallpaper = null;
+    let currentPage = 1;
+    const PAGE_SIZE = 9;
 
     const galleryGrid = document.getElementById("galleryGrid");
     const mobileGrid = document.getElementById("mobileGrid");
@@ -630,11 +680,18 @@
 
     function getFiltered() {
       const query = searchInput.value.trim().toLowerCase();
-      return wallpapers.filter(w => {
-        const text = `${w.title} ${w.category} ${w.type} ${w.mood} ${w.description} ${w.tags?.join(" ")}`.toLowerCase();
-        const filterMatch = currentFilter === "All" || text.includes(currentFilter.toLowerCase().replace(/\s+/g, "-")) || text.includes(currentFilter.toLowerCase());
+      const sortMode = document.getElementById("sortSelect").value;
+      const matches = wallpapers.filter(w => {
+        const text = [w.title, w.category, w.type, w.mood, w.description,
+          ...(Array.isArray(w.tags) ? w.tags : []),
+          ...(Array.isArray(w.extraTags) ? w.extraTags : [])].join(" ").toLowerCase();
+        const term = currentFilter.toLowerCase();
+        const filterMatch = currentFilter === "All" || text.includes(term) || text.includes(term.replace(/\s+/g, "-"));
         return filterMatch && (!query || text.includes(query));
       });
+      if (sortMode === "az") return matches.sort((a, b) => String(a.title || "").localeCompare(String(b.title || "")));
+      if (sortMode === "oldest") return matches.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+      return matches.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
     }
 
     function isDesktopWallpaper(w) {
@@ -684,15 +741,66 @@
       heroAccentDetail.textContent = accent?.category || "Red Glow";
     }
 
+    function updateDiscoveryTiles() {
+      const sets = [
+        { filter: "Mobile 9:16", image: "discoveryMobileArt", count: "discoveryMobileCount", test: isMobileWallpaper },
+        { filter: "Desktop 16:9", image: "discoveryDesktopArt", count: "discoveryDesktopCount", test: isDesktopWallpaper }
+      ];
+      sets.forEach(({ filter, image, count, test }) => {
+        const tile = document.querySelector(`[data-quick-filter="${filter}"]`);
+        const matches = wallpapers.filter(test);
+        const item = matches.find(w => w.imageUrl);
+        if (!tile || !item) {
+          if (tile) tile.hidden = true;
+          return;
+        }
+        const art = document.getElementById(image);
+        art.src = item.imageUrl;
+        art.alt = "";
+        document.getElementById(count).textContent = matches.length + (matches.length === 1 ? " wallpaper" : " wallpapers");
+      });
+    }
+
+    function renderPagination(total) {
+      const pagination = document.getElementById("galleryPagination");
+      const pageCount = Math.ceil(total / PAGE_SIZE);
+      if (pageCount <= 1) {
+        pagination.replaceChildren();
+        return;
+      }
+      const visible = [...new Set([1, pageCount, currentPage - 1, currentPage, currentPage + 1])]
+        .filter(n => n >= 1 && n <= pageCount).sort((a, b) => a - b);
+      const links = [];
+      let previous = 0;
+      for (const n of visible) {
+        if (n > previous + 1) links.push('<span class="pager-ellipsis" aria-hidden="true">…</span>');
+        links.push(`<button type="button" class="page-number ${n === currentPage ? "active" : ""}" data-page="${n}" aria-label="Go to page ${n}" ${n === currentPage ? 'aria-current="page"' : ""}>${n}</button>`);
+        previous = n;
+      }
+      pagination.innerHTML = `
+        <span class="pager-meta">Page ${currentPage} of ${pageCount}</span>
+        <div class="pager-controls">
+          <button type="button" class="pager-nav" data-page="${currentPage - 1}" ${currentPage === 1 ? "disabled" : ""} aria-label="Previous wallpaper page">Previous</button>
+          ${links.join("")}
+          <button type="button" class="pager-nav" data-page="${currentPage + 1}" ${currentPage === pageCount ? "disabled" : ""} aria-label="Next wallpaper page">Next</button>
+        </div>`;
+    }
+
     function render() {
       const filtered = getFiltered();
-      galleryGrid.innerHTML = filtered.map(cardTemplate).join("");
+      const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      currentPage = Math.min(Math.max(currentPage, 1), pages);
+      const offset = (currentPage - 1) * PAGE_SIZE;
+      galleryGrid.innerHTML = filtered.slice(offset, offset + PAGE_SIZE).map(cardTemplate).join("");
       const counter = document.getElementById("resultCount");
-      if (counter) counter.textContent = filtered.length + (filtered.length === 1 ? " wallpaper" : " wallpapers") + " in view";
+      if (counter) counter.textContent = filtered.length
+        ? `Showing ${offset + 1}–${Math.min(offset + PAGE_SIZE, filtered.length)} of ${filtered.length} artworks`
+        : "No matching artworks";
+      document.getElementById("resultsHeading").textContent = currentFilter === "All" ? "Latest from the vault" : currentFilter;
       emptyState.style.display = filtered.length ? "none" : "block";
-      mobileGrid.innerHTML = wallpapers.filter(isMobileWallpaper).map(cardTemplate).join("");
-      desktopGrid.innerHTML = wallpapers.filter(isDesktopWallpaper).map(cardTemplate).join("");
-      updateHeroShowcase();
+      mobileGrid.innerHTML = wallpapers.filter(isMobileWallpaper).slice(0, 4).map(cardTemplate).join("");
+      desktopGrid.innerHTML = wallpapers.filter(isDesktopWallpaper).slice(0, 3).map(cardTemplate).join("");
+      renderPagination(filtered.length);
       bindPreviewButtons();
     }
 
@@ -701,8 +809,10 @@
         const response = await fetch("/api/wallpapers");
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "Unable to load wallpapers.");
-        wallpapers = data.wallpapers || [];
+        wallpapers = Array.isArray(data.wallpapers) ? data.wallpapers : [];
         loader.style.display = "none";
+        updateHeroShowcase();
+        updateDiscoveryTiles();
         render();
       } catch (error) {
         loader.textContent = error.message;
@@ -710,16 +820,39 @@
       }
     }
 
+    function applyFilter(filter, jumpToGallery = false) {
+      currentFilter = filter;
+      currentPage = 1;
+      filters.querySelectorAll(".filter").forEach(b => b.classList.toggle("active", b.dataset.filter === filter));
+      render();
+      if (jumpToGallery) document.getElementById("galleryResults").scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "start"
+      });
+    }
+
     filters.addEventListener("click", event => {
       const btn = event.target.closest(".filter");
-      if (!btn) return;
-      filters.querySelectorAll(".filter").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentFilter = btn.dataset.filter;
-      render();
+      if (btn) applyFilter(btn.dataset.filter);
     });
-
-    searchInput.addEventListener("input", render);
+    document.querySelectorAll(".discovery-tile").forEach(tile => {
+      tile.addEventListener("click", () => applyFilter(tile.dataset.quickFilter, true));
+    });
+    searchInput.addEventListener("input", () => { currentPage = 1; render(); });
+    document.getElementById("sortSelect").addEventListener("change", () => { currentPage = 1; render(); });
+    document.getElementById("galleryPagination").addEventListener("click", event => {
+      const btn = event.target.closest("button[data-page]");
+      if (!btn || btn.disabled) return;
+      const targetPage = Number(btn.dataset.page);
+      const maxPage = Math.ceil(getFiltered().length / PAGE_SIZE);
+      if (!Number.isInteger(targetPage) || targetPage < 1 || targetPage > maxPage || targetPage === currentPage) return;
+      currentPage = targetPage;
+      render();
+      document.getElementById("galleryResults").scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "start"
+      });
+    });
 
     const modal = document.getElementById("previewModal");
     const modalPreview = document.getElementById("modalPreview");
