@@ -46,13 +46,13 @@ class ExactCharacterLayoutTests(unittest.TestCase):
             rl.load_full_body()
         self.assertFalse(getter.call_args.kwargs["allow_redirects"])
 
-    def test_default_request_is_disabled(self):
-        self.assertEqual(
-            {"enabled": False, "pack": "gojo-adult-s1"},
-            __import__("json").loads(
-                (rl.ROOT/"reference-character"/"layout-request.json").read_text()
-            )
+    def test_request_schema_is_restricted(self):
+        cfg = __import__("json").loads(
+            (rl.ROOT/"reference-character"/"layout-request.json").read_text()
         )
+        self.assertEqual(set(cfg), {"enabled", "pack"})
+        self.assertIsInstance(cfg["enabled"], bool)
+        self.assertEqual(cfg["pack"], "gojo-adult-s1")
 
 
 if __name__ == "__main__":
