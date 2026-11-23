@@ -1,0 +1,32 @@
+[
+  {
+    "id": "gojo-six-eyes",
+    "name": "Gojo — Six Eyes",
+    "description": "Satoru Gojo from Jujutsu Kaisen, silver-white hair, sharp ice-blue eyes, dark high-collar uniform, confident close-up, beautifully controlled cyan electric energy, ink-like shadows, vibrant cyan rim light, refined skin shading, accurate facial symmetry",
+    "mood": "icy-blue cinematic"
+  },
+  {
+    "id": "gojo-limitless",
+    "name": "Gojo — Limitless",
+    "description": "Satoru Gojo from Jujutsu Kaisen in an iconic black uniform, dramatic full-body battle stance, floating broken stone and blue cosmic energy, elegant hair motion, clear silhouette, sophisticated layered environment and polished anime film key-art",
+    "mood": "electric blue fantasy"
+  },
+  {
+    "id": "gojo-purple",
+    "name": "Gojo — Hollow Purple",
+    "description": "Satoru Gojo from Jujutsu Kaisen, commanding confident expression, carefully controlled violet and indigo supernatural light, deep cinematic perspective, detailed architecture dissolving into floating particles, atmospheric smoke, premium illustrated anime film poster",
+    "mood": "deep violet"
+  },
+  {
+    "id": "crimson-ronin",
+    "name": "Crimson Ronin — Original",
+    "description": "original anime ronin with charcoal layered robes, hand on sheathed katana, standing before enormous blood-red eclipse, falling ash, scarlet rim light, intricate hand-painted Japanese rooftop scenery, subtle dramatic grain, visually unmistakable silhouette",
+    "mood": "crimson minimalism"
+  },
+  {
+    "id": "neon-nocturne",
+    "name": "Neon Nocturne — Original",
+    "description": "original anime young woman in a rain-covered futuristic Kyoto alley, stylish indigo coat, expressive eyes, luminous signs reflected in puddles, deep teal-magenta contrast, rich painted environmental detail, exquisite delicate 2D illustration",
+    "mood": "neon atmospheric"
+  }
+]
