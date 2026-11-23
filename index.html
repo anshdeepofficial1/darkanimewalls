@@ -686,7 +686,13 @@
           ...(Array.isArray(w.tags) ? w.tags : []),
           ...(Array.isArray(w.extraTags) ? w.extraTags : [])].join(" ").toLowerCase();
         const term = currentFilter.toLowerCase();
-        const filterMatch = currentFilter === "All" || text.includes(term) || text.includes(term.replace(/\s+/g, "-"));
+        const categoryText = [w.category, w.mood,
+          ...(Array.isArray(w.extraTags) ? w.extraTags : [])].join(" ").toLowerCase();
+        const filterMatch = currentFilter === "All"
+          || (currentFilter === "Mobile 9:16" && isMobileWallpaper(w))
+          || (currentFilter === "Desktop 16:9" && isDesktopWallpaper(w))
+          || (currentFilter !== "Mobile 9:16" && currentFilter !== "Desktop 16:9" &&
+              (categoryText.includes(term) || categoryText.includes(term.replace(/\s+/g, "-"))));
         return filterMatch && (!query || text.includes(query));
       });
       if (sortMode === "az") return matches.sort((a, b) => String(a.title || "").localeCompare(String(b.title || "")));
@@ -796,7 +802,10 @@
       if (counter) counter.textContent = filtered.length
         ? `Showing ${offset + 1}–${Math.min(offset + PAGE_SIZE, filtered.length)} of ${filtered.length} artworks`
         : "No matching artworks";
-      document.getElementById("resultsHeading").textContent = currentFilter === "All" ? "Latest from the vault" : currentFilter;
+      const sortMode = document.getElementById("sortSelect").value;
+      document.getElementById("resultsHeading").textContent = currentFilter !== "All"
+        ? currentFilter : sortMode === "oldest" ? "From the beginning"
+        : sortMode === "az" ? "Alphabetical archive" : "Latest from the vault";
       emptyState.style.display = filtered.length ? "none" : "block";
       mobileGrid.innerHTML = wallpapers.filter(isMobileWallpaper).slice(0, 4).map(cardTemplate).join("");
       desktopGrid.innerHTML = wallpapers.filter(isDesktopWallpaper).slice(0, 3).map(cardTemplate).join("");
