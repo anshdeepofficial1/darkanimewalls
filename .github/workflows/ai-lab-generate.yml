@@ -1,0 +1,49 @@
+name: Dark Anime AI Lab — isolated image test
+
+on:
+  push:
+    branches:
+      - lab/premium-wallpaper-engine
+    paths:
+      - "ai-lab/live-request.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dark-anime-ai-lab-live
+  cancel-in-progress: false
+
+jobs:
+  image-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install isolated lab-only Python dependencies
+        run: python -m pip install --disable-pip-version-check -r ai-lab/requirements.txt
+      - name: Guarded premium wallpaper image test
+        run: python ai-lab/live_run.py
+      - name: Upload generated candidates and private review gallery
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dark-anime-premium-candidates-${{ github.run_id }}
+          path: |
+            ai-lab/out/*.png
+            ai-lab/out/manifest.json
+            ai-lab/out/review.html
+          retention-days: 7
+          if-no-files-found: ignore
+      - name: Explicit unpublished state
+        if: always()
+        run: |
+          echo "## Dark Anime Walls AI Lab" >> "$GITHUB_STEP_SUMMARY"
+          echo "Image candidates only. No Instagram, Cloudinary, website, or production release actions exist in this workflow." >> "$GITHUB_STEP_SUMMARY"
+          echo "Never interpret machine-screen acceptance as final artistic approval." >> "$GITHUB_STEP_SUMMARY"
